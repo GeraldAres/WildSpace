@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WildSpace — Your Productive Study Session Starts Here</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Landing-page-only overrides */
+    .hero { position: relative; }
+    .hero-title em { font-style: normal; }
+    /* subtle animated grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero, .features { position: relative; z-index: 1; }
+  </style>
+</head>
+<body class="landing-body">
+
+  <!-- Page transition overlay -->
+  <div id="page-transition"></div>
+
+  <!-- Top-right Wildcat icon -->
+  <div class="corner-icon">
+    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 4 L20 22 C14 24 10 30 10 37 C10 50 20 58 32 58 C44 58 54 50 54 37 C54 30 50 24 44 22 L56 4 L46 14 C42 10 37 8 32 8 C27 8 22 10 18 14 Z"/>
+      <circle cx="24" cy="36" r="3" fill="white"/>
+      <circle cx="40" cy="36" r="3" fill="white"/>
+      <path d="M27 46 Q32 50 37 46" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="index.html" class="nav-logo" data-nav>
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 4 L20 22 C14 24 10 30 10 37 C10 50 20 58 32 58 C44 58 54 50 54 37 C54 30 50 24 44 22 L56 4 L46 14 C42 10 37 8 32 8 C27 8 22 10 18 14 Z"/>
+          <circle cx="24" cy="36" r="3" fill="white"/>
+          <circle cx="40" cy="36" r="3" fill="white"/>
+          <path d="M27 46 Q32 50 37 46" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">WildSpace</span>
+    </a>
+    <div class="nav-actions">
+      <a href="login.html" class="nav-link" data-nav>Log in</a>
+      <a href="register.html" class="nav-btn" data-nav>Sign up</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <span class="hero-eyebrow">✦ Study smarter, not harder</span>
+    <h1 class="hero-title">
+      Your<br>
+      <em>Wild<span class="accent">Space</span></em><br>
+      to Learn.
+    </h1>
+    <p class="hero-sub">
+      The all-in-one study platform built for students who refuse to settle.
+      Collaborate, focus, and grow — together.
+    </p>
+    <a href="register.html" class="hero-cta" data-nav>Get Started &rsaquo;</a>
+
+    <!-- scroll hint -->
+    <div class="scroll-hint">
+      <span>What makes WildSpace different?</span>
+      <div class="scroll-dot"></div>
+      <div class="scroll-dot"></div>
+      <div class="scroll-dot"></div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <p class="section-label">Everything you need</p>
+    <h2 class="section-title">Book <span style="color:var(--blue)">Smarter.</span><br>Study<span style="color:var(--blue)"> Better.</span></h2>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <h3 class="feature-name">Smart Study Sessions</h3>
+        <p class="feature-desc">
+          Pomodoro timers, focus music, and distraction blocking — everything configured for deep work.
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤝</div>
+        <h3 class="feature-name">Collaborative Rooms</h3>
+        <p class="feature-desc">
+          Study with classmates in real-time virtual rooms. Share notes, quiz each other, stay accountable.
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗓️</div>
+        <h3 class="feature-name">Academic Planner</h3>
+        <p class="feature-desc">
+          Sync your syllabus, track deadlines, and build study schedules that adapt to your pace.
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3 class="feature-name">Progress Analytics</h3>
+        <p class="feature-desc">
+          Visualize your study streaks, subject time distribution, and peak performance hours.
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3 class="feature-name">Edu Verified</h3>
+        <p class="feature-desc">
+          Educational email verification keeps the platform focused, safe, and student-exclusive.
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3 class="feature-name">Goal Tracking</h3>
+        <p class="feature-desc">
+          Set weekly targets, earn milestones, and stay motivated with personalised achievement badges.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 WildSpace &mdash; developed by <strong>Ycia&amp;Rald Productions</strong>. All rights reserved.</p>
+    <p style="margin-top:6px">
+      <a href="login.html" data-nav>Log in</a> &nbsp;·&nbsp;
+      <a href="register.html" data-nav>Sign up</a>
+    </p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
