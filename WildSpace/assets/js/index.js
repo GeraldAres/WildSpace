@@ -80,64 +80,19 @@ if (heroImage) {
     });
 }
 
-// ============ OBSERVE ANIMATIONS ON SCROLL ============
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.animation = 'slideUpFade 0.8s ease-out forwards';
-        }
-    });
-}, observerOptions);
-
-// Observe hero right content
-const heroRight = document.querySelector('.hero-right');
-if (heroRight) {
-    observer.observe(heroRight);
-}
-
-// Observe page 2 content
-const page2Left = document.querySelector('.page2-left');
-if (page2Left) {
-    observer.observe(page2Left);
-}
-
-// Observe section 3
-const section3Content = document.querySelector('.section3-content');
-if (section3Content) {
-    observer.observe(section3Content);
-}
-
-// Observe section 4 left
-const section4Left = document.querySelector('.section4-left');
-if (section4Left) {
-    observer.observe(section4Left);
-}
-
-// Observe section 4 right
-const section4Right = document.querySelector('.section4-right');
-if (section4Right) {
-    observer.observe(section4Right);
-}
-
-// Observe section 5 elements
-const section5Header = document.querySelector('.section5-header');
-const section5Left = document.querySelector('.section5-left');
-const section5Right = document.querySelector('.section5-right');
-const section5FooterSection = document.querySelector('.section5-footer-section');
-
-if (section5Header) observer.observe(section5Header);
-if (section5Left) observer.observe(section5Left);
-if (section5Right) observer.observe(section5Right);
-if (section5FooterSection) observer.observe(section5FooterSection);
-
-// Observe footer
-const footer = document.querySelector('.footer-container');
-if (footer) observer.observe(footer);
+// ============ PAGE LOAD ANIMATION ============
+window.addEventListener('load', () => {
+    document.body.style.opacity = '1';
+    
+    // Animate hero content on load
+    const heroTitle = document.querySelector('.hero-title');
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+    const ctaButton = document.querySelector('.cta-primary');
+    
+    if (heroTitle) heroTitle.style.animation = 'slideUpFade 0.8s ease-out 0.2s backwards';
+    if (heroSubtitle) heroSubtitle.style.animation = 'slideUpFade 0.8s ease-out 0.3s backwards';
+    if (ctaButton) ctaButton.style.animation = 'slideUpFade 0.8s ease-out 0.4s backwards';
+});
 
 // ============ ACCESSIBILITY - KEYBOARD NAVIGATION ============
 document.querySelectorAll('.cta-button, .nav-link').forEach(element => {
@@ -156,40 +111,6 @@ document.querySelectorAll('.cta-button, .nav-link').forEach(element => {
         this.style.outline = 'none';
     });
 });
-
-// ============ PAGE LOAD ANIMATION ============
-window.addEventListener('load', () => {
-    document.body.style.opacity = '1';
-    
-    // Animate hero content on load
-    const heroTitle = document.querySelector('.hero-title');
-    const heroSubtitle = document.querySelector('.hero-subtitle');
-    const ctaButton = document.querySelector('.cta-primary');
-    
-    if (heroTitle) heroTitle.style.animation = 'slideUpFade 0.8s ease-out 0.2s backwards';
-    if (heroSubtitle) heroSubtitle.style.animation = 'slideUpFade 0.8s ease-out 0.3s backwards';
-    if (ctaButton) ctaButton.style.animation = 'slideUpFade 0.8s ease-out 0.4s backwards';
-});
-
-// ============ LAZY LOADING IMAGE ============
-if ('IntersectionObserver' in window) {
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                if (img.dataset.src) {
-                    img.src = img.dataset.src;
-                }
-                img.classList.add('loaded');
-                observer.unobserve(img);
-            }
-        });
-    });
-
-    document.querySelectorAll('img[data-src]').forEach(img => {
-        imageObserver.observe(img);
-    });
-}
 
 // ============ RIPPLE EFFECT CSS ============
 const style = document.createElement('style');
