@@ -21,38 +21,41 @@ if (isset($_POST['register'])) {
         exit();
     }
 
-    $checkEmail = "SELECT * FROM tbluser WHERE email = ?";
-    $stmt = mysqli_prepare($conn, $checkEmail);
-    mysqli_stmt_bind_param($stmt, "s", $email);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
+    $checkEmail = "SELECT * FROM tbluser WHERE email = $1";
+    $result = pg_query_params($conn, $checkEmail, [$email]);
 
-    if (mysqli_num_rows($result) > 0) {
+    if (!$result) {
+        echo "Database error: " . pg_last_error($conn);
+        exit();
+    }
+
+    if (pg_num_rows($result) > 0) {
         echo "Email already exists.";
         exit();
     }
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    $insertUser = "INSERT INTO tbluser (email, password) VALUES (?, ?)";
-    $stmt = mysqli_prepare($conn, $insertUser);
-    mysqli_stmt_bind_param($stmt, "ss", $email, $hashed_password);
+    $insertUser = "INSERT INTO tbluser (email, password) VALUES ($1, $2) RETURNING user_id";
+    $userResult = pg_query_params($conn, $insertUser, [$email, $hashed_password]);
 
-    if (mysqli_stmt_execute($stmt)) {
-        $user_id = mysqli_insert_id($conn);
+    if (!$userResult) {
+        echo "User registration failed: " . pg_last_error($conn);
+        exit();
+    }
 
-        $insertAdmin = "INSERT INTO tbladmin (user_id) VALUES (?)";
-        $stmtAdmin = mysqli_prepare($conn, $insertAdmin);
-        mysqli_stmt_bind_param($stmtAdmin, "i", $user_id);
+    $user = pg_fetch_assoc($userResult);
+    $user_id = $user['user_id'];
 
-        if (mysqli_stmt_execute($stmtAdmin)) {
-            header("Location: ../test_screens/login.php");
-            exit();
-        } else {
-            echo "Admin registration failed: " . mysqli_error($conn);
-        }
+    $insertAdmin = "INSERT INTO tbladmin (user_id) VALUES ($1)";
+    $adminResult = pg_query_params($conn, $insertAdmin, [$user_id]);
+
+    if ($adminResult) {
+        header("Location: ../test_screens/login.php");
+        exit();
     } else {
-        echo "User registration failed: " . mysqli_error($conn);
+        echo "Admin registration failed: " . pg_last_error($conn);
+        exit();
     }
 }
 ?>

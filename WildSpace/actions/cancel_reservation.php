@@ -7,20 +7,25 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+if (!isset($_GET['id'])) {
+    header("Location: ../test_screens/reservation_status.php");
+    exit();
+}
+
 $user_id = $_SESSION['user_id'];
 $reservation_id = $_GET['id'];
 
 $sql = "UPDATE tblreservation
         SET status = 'Cancelled'
-        WHERE reservation_id = ? AND user_id = ?";
+        WHERE reservation_id = $1 AND user_id = $2";
 
-$stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "ii", $reservation_id, $user_id);
+$result = pg_query_params($conn, $sql, [$reservation_id, $user_id]);
 
-if (mysqli_stmt_execute($stmt)) {
+if ($result) {
     header("Location: ../test_screens/reservation_status.php");
     exit();
 } else {
-    echo "Failed to cancel reservation: " . mysqli_error($conn);
+    echo "Failed to cancel reservation: " . pg_last_error($conn);
+    exit();
 }
 ?>

@@ -24,52 +24,40 @@ if (isset($_POST['admin_create_reservation'])) {
         exit();
     }
 
-    $findUser = "SELECT user_id FROM tbluser WHERE email = ?";
-    $stmtUser = mysqli_prepare($conn, $findUser);
+    $findUser = "SELECT user_id FROM tbluser WHERE email = $1";
+    $userResult = pg_query_params($conn, $findUser, [$email]);
 
-    if (!$stmtUser) {
-        echo "Database error: " . mysqli_error($conn);
+    if (!$userResult) {
+        echo "Database error: " . pg_last_error($conn);
         exit();
     }
 
-    mysqli_stmt_bind_param($stmtUser, "s", $email);
-    mysqli_stmt_execute($stmtUser);
-    $userResult = mysqli_stmt_get_result($stmtUser);
-
-    if (mysqli_num_rows($userResult) == 0) {
+    if (pg_num_rows($userResult) == 0) {
         echo "No user found with that email.";
         exit();
     }
 
-    $user = mysqli_fetch_assoc($userResult);
+    $user = pg_fetch_assoc($userResult);
     $user_id = $user['user_id'];
 
     $insertReservation = "INSERT INTO tblreservation 
                           (user_id, admin_id, status, reservation_date, capacity)
-                          VALUES (?, ?, ?, ?, ?)";
+                          VALUES ($1, $2, $3, $4, $5)";
 
-    $stmtReservation = mysqli_prepare($conn, $insertReservation);
-
-    if (!$stmtReservation) {
-        echo "Database error: " . mysqli_error($conn);
-        exit();
-    }
-
-    mysqli_stmt_bind_param(
-        $stmtReservation,
-        "iissi",
+    $reservationResult = pg_query_params($conn, $insertReservation, [
         $user_id,
         $admin_id,
         $status,
         $reservation_date,
         $capacity
-    );
+    ]);
 
-    if (mysqli_stmt_execute($stmtReservation)) {
+    if ($reservationResult) {
         header("Location: ../test_screens/admin_reservations.php");
         exit();
     } else {
-        echo "Failed to create reservation: " . mysqli_error($conn);
+        echo "Failed to create reservation: " . pg_last_error($conn);
+        exit();
     }
 }
 ?>

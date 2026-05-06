@@ -25,22 +25,21 @@ if (isset($_POST['book_reservation'])) {
 
     $sql = "INSERT INTO tblreservation 
             (user_id, status, reservation_date, capacity)
-            VALUES (?, ?, ?, ?)";
+            VALUES ($1, $2, $3, $4)";
 
-    $stmt = mysqli_prepare($conn, $sql);
+    $result = pg_query_params($conn, $sql, [
+        $user_id,
+        $status,
+        $reservation_date,
+        $capacity
+    ]);
 
-    if (!$stmt) {
-        echo "Database error: " . mysqli_error($conn);
-        exit();
-    }
-
-    mysqli_stmt_bind_param($stmt, "issi", $user_id, $status, $reservation_date, $capacity);
-
-    if (mysqli_stmt_execute($stmt)) {
+    if ($result) {
         header("Location: ../test_screens/reservation_status.php");
         exit();
     } else {
-        echo "Failed to book reservation: " . mysqli_error($conn);
+        echo "Failed to book reservation: " . pg_last_error($conn);
+        exit();
     }
 }
 ?>
