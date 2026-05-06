@@ -24,23 +24,20 @@ if (!in_array($status, $allowed_statuses)) {
 }
 
 $sql = "UPDATE tblreservation
-        SET status = ?, admin_id = ?
-        WHERE reservation_id = ?";
+        SET status = $1, admin_id = $2
+        WHERE reservation_id = $3";
 
-$stmt = mysqli_prepare($conn, $sql);
+$result = pg_query_params($conn, $sql, [
+    $status,
+    $admin_id,
+    $reservation_id
+]);
 
-if (!$stmt) {
-    echo "Database error: " . mysqli_error($conn);
-    exit();
-}
-
-mysqli_stmt_bind_param($stmt, "sii", $status, $admin_id, $reservation_id);
-
-if (mysqli_stmt_execute($stmt)) {
+if ($result) {
     header("Location: ../../test_screens/admin_reservations.php");
     exit();
 } else {
-    echo "Failed to update reservation status: " . mysqli_error($conn);
+    echo "Failed to update reservation status: " . pg_last_error($conn);
     exit();
 }
 ?>

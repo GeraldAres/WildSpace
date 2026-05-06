@@ -10,13 +10,14 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 $sql = "SELECT * FROM tblreservation 
-        WHERE user_id = ?
+        WHERE user_id = $1
         ORDER BY date_created DESC";
 
-$stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "i", $user_id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+$result = pg_query_params($conn, $sql, [$user_id]);
+
+if (!$result) {
+    die("Query failed: " . pg_last_error($conn));
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,13 +35,13 @@ $result = mysqli_stmt_get_result($stmt);
 <table border="1" cellpadding="10">
     <tr>
         <th>Reservation ID</th>
-        <th>Date and Time</th>
+        <th>Date</th>
         <th>Status</th>
         <th>Date Created</th>
         <th>Actions</th>
     </tr>
 
-    <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+    <?php while ($row = pg_fetch_assoc($result)) { ?>
         <tr>
             <td><?php echo $row['reservation_id']; ?></td>
             <td><?php echo $row['reservation_date']; ?></td>

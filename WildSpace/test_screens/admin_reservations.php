@@ -20,10 +20,10 @@ $sql = "SELECT
         INNER JOIN tbluser u ON r.user_id = u.user_id
         ORDER BY r.date_created DESC";
 
-$result = mysqli_query($conn, $sql);
+$result = pg_query($conn, $sql);
 
 if (!$result) {
-    die("Query failed: " . mysqli_error($conn));
+    die("Query failed: " . pg_last_error($conn));
 }
 ?>
 
@@ -52,7 +52,7 @@ if (!$result) {
         <th>Actions</th>
     </tr>
 
-    <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+    <?php while ($row = pg_fetch_assoc($result)) { ?>
         <tr>
             <td><?php echo $row['reservation_id']; ?></td>
             <td><?php echo $row['email']; ?></td>
@@ -62,32 +62,31 @@ if (!$result) {
             <td><?php echo $row['date_created']; ?></td>
             <td>
                 <?php if ($row['status'] == 'Pending') { ?>
-<a href="../actions/admin/update_reservation_status.php?id=<?php echo $row['reservation_id']; ?>&status=Approved"
-   onclick="return confirm('Approve this reservation?');">
-   Approve
-</a>
+                    <a href="../actions/admin/update_reservation_status.php?id=<?php echo $row['reservation_id']; ?>&status=Approved"
+                       onclick="return confirm('Approve this reservation?');">
+                       Approve
+                    </a>
 
                     |
 
-<a href="../actions/admin/update_reservation_status.php?id=<?php echo $row['reservation_id']; ?>&status=Rejected"
-   onclick="return confirm('Reject this reservation?');">
-   Reject
-</a>
+                    <a href="../actions/admin/update_reservation_status.php?id=<?php echo $row['reservation_id']; ?>&status=Rejected"
+                       onclick="return confirm('Reject this reservation?');">
+                       Reject
+                    </a>
 
                     |
                 <?php } ?>
 
-              <a href="../actions/admin/admin_delete_reservation.php?id=<?php echo $row['reservation_id']; ?>"
-   onclick="return confirm('Delete this reservation permanently?');">
-   Delete
-</a>
+                <a href="../actions/admin/admin_delete_reservation.php?id=<?php echo $row['reservation_id']; ?>"
+                   onclick="return confirm('Delete this reservation permanently?');">
+                   Delete
+                </a>
             </td>
         </tr>
     <?php } ?>
 </table>
 
 <br>
-
 
 </body>
 </html>

@@ -11,46 +11,39 @@ if (isset($_POST['login'])) {
         exit();
     }
 
-    $sql = "SELECT * FROM tbluser WHERE email = ?";
-    $stmt = mysqli_prepare($conn, $sql);
+    $sql = "SELECT * FROM tbluser WHERE email = $1";
+    $result = pg_query_params($conn, $sql, [$email]);
 
-    if (!$stmt) {
-        echo "Database error: " . mysqli_error($conn);
+    if (!$result) {
+        echo "Database error: " . pg_last_error($conn);
         exit();
     }
 
-    mysqli_stmt_bind_param($stmt, "s", $email);
-    mysqli_stmt_execute($stmt);
-
-    $result = mysqli_stmt_get_result($stmt);
-
-    if (mysqli_num_rows($result) == 1) {
-        $user = mysqli_fetch_assoc($result);
+    if (pg_num_rows($result) == 1) {
+        $user = pg_fetch_assoc($result);
 
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['email'] = $user['email'];
 
-            // Check if the user is an admin
-            $adminSql = "SELECT * FROM tbladmin WHERE user_id = ?";
-            $adminStmt = mysqli_prepare($conn, $adminSql);
-            mysqli_stmt_bind_param($adminStmt, "i", $user['user_id']);
-            mysqli_stmt_execute($adminStmt);
+            $adminSql = "SELECT * FROM tbladmin WHERE user_id = $1";
+            $adminResult = pg_query_params($conn, $adminSql, [$user['user_id']]);
 
-            $adminResult = mysqli_stmt_get_result($adminStmt);
+            if (!$adminResult) {
+                echo "Database error: " . pg_last_error($conn);
+                exit();
+            }
 
-            if (mysqli_num_rows($adminResult) == 1) {
-                $admin = mysqli_fetch_assoc($adminResult);
+            if (pg_num_rows($adminResult) == 1) {
+                $admin = pg_fetch_assoc($adminResult);
                 $_SESSION['admin_id'] = $admin['admin_id'];
                 $_SESSION['role'] = "admin";
             } else {
                 $_SESSION['role'] = "user";
             }
 
-            // Always redirect to reservation page after login
             header("Location: ../test_screens/admin_reservations.php");
             exit();
-
         } else {
             echo "Incorrect password.";
             exit();

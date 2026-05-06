@@ -14,22 +14,15 @@ if (!isset($_GET['id'])) {
 
 $reservation_id = $_GET['id'];
 
-$sql = "DELETE FROM tblreservation WHERE reservation_id = ?";
+$sql = "DELETE FROM tblreservation WHERE reservation_id = $1";
 
-$stmt = mysqli_prepare($conn, $sql);
+$result = pg_query_params($conn, $sql, [$reservation_id]);
 
-if (!$stmt) {
-    echo "Database error: " . mysqli_error($conn);
-    exit();
-}
-
-mysqli_stmt_bind_param($stmt, "i", $reservation_id);
-
-if (mysqli_stmt_execute($stmt)) {
+if ($result) {
     header("Location: ../../test_screens/admin_reservations.php");
     exit();
 } else {
-    echo "Failed to delete reservation: " . mysqli_error($conn);
+    echo "Failed to delete reservation: " . pg_last_error($conn);
     exit();
 }
 ?>

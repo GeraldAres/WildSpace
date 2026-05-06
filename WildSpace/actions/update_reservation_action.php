@@ -13,17 +13,21 @@ if (isset($_POST['update_reservation'])) {
     $reservation_date = $_POST['reservation_date'];
 
     $sql = "UPDATE tblreservation
-            SET reservation_date = ?, status = 'Pending'
-            WHERE reservation_id = ? AND user_id = ?";
+            SET reservation_date = $1, status = 'Pending'
+            WHERE reservation_id = $2 AND user_id = $3";
 
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "sii", $reservation_date, $reservation_id, $user_id);
+    $result = pg_query_params($conn, $sql, [
+        $reservation_date,
+        $reservation_id,
+        $user_id
+    ]);
 
-    if (mysqli_stmt_execute($stmt)) {
+    if ($result) {
         header("Location: ../test_screens/reservation_status.php");
         exit();
     } else {
-        echo "Failed to update reservation: " . mysqli_error($conn);
+        echo "Failed to update reservation: " . pg_last_error($conn);
+        exit();
     }
 }
 ?>
