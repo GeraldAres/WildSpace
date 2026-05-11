@@ -15,10 +15,27 @@ if (!isset($_GET['id'])) {
 $user_id = $_SESSION['user_id'];
 $reservation_id = $_GET['id'];
 
-$sql = "SELECT * FROM tblreservation 
-        WHERE reservation_id = $1 AND user_id = $2";
+// Get the student_id connected to the logged-in user_id
+$studentSql = "SELECT student_id FROM tblstudent WHERE user_id = $1";
+$studentResult = pg_query_params($conn, $studentSql, [$user_id]);
 
-$result = pg_query_params($conn, $sql, [$reservation_id, $user_id]);
+if (!$studentResult) {
+    die("Query failed: " . pg_last_error($conn));
+}
+
+if (pg_num_rows($studentResult) == 0) {
+    echo "Student account not found.";
+    exit();
+}
+
+$student = pg_fetch_assoc($studentResult);
+$student_id = $student['student_id'];
+
+// Use student_id instead of user_id in tblreservation
+$sql = "SELECT * FROM tblreservation 
+        WHERE reservation_id = $1 AND student_id = $2";
+
+$result = pg_query_params($conn, $sql, [$reservation_id, $student_id]);
 
 if (!$result) {
     die("Query failed: " . pg_last_error($conn));

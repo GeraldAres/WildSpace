@@ -12,14 +12,25 @@ if (isset($_POST['update_reservation'])) {
     $reservation_id = $_POST['reservation_id'];
     $reservation_date = $_POST['reservation_date'];
 
+    $studentSql = "SELECT student_id FROM tblstudent WHERE user_id = $1";
+    $studentResult = pg_query_params($conn, $studentSql, [$user_id]);
+
+    if (!$studentResult || pg_num_rows($studentResult) == 0) {
+        echo "Student account not found.";
+        exit();
+    }
+
+    $student = pg_fetch_assoc($studentResult);
+    $student_id = $student['student_id'];
+
     $sql = "UPDATE tblreservation
             SET reservation_date = $1, status = 'Pending'
-            WHERE reservation_id = $2 AND user_id = $3";
+            WHERE reservation_id = $2 AND student_id = $3";
 
     $result = pg_query_params($conn, $sql, [
         $reservation_date,
         $reservation_id,
-        $user_id
+        $student_id
     ]);
 
     if ($result) {

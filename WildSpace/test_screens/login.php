@@ -70,9 +70,15 @@
         </div>
 
         <div class="auth-right">
-            <div class="auth-image-container">
-                <div class="auth-image-placeholder">Person Image</div>
+            <div class="auth-image-container" style="width: 650px; height: 650px; overflow: visible;">
+                <img 
+                    src="../assets/images/person1.png" 
+                    alt="Person Image" 
+                    class="auth-image"
+                    style="width: 600px; max-width: none; height: auto;"
+                >
             </div>
+
         </div>
     </section>
 
