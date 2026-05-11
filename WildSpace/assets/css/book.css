@@ -1,0 +1,379 @@
+:root {
+    --primary-black: #000000;
+    --text-dark: #1a1a1a;
+    --text-gray: #555555;
+    --white: #ffffff;
+    --light-gray: #f8f8f8;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --spacing-3xl: 4rem;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+    color: var(--text-dark);
+    background: var(--white);
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+ 
+/* Logo/Branding */
+.logo {
+    flex: 0 0 auto;
+    text-align: center;
+}
+ 
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* ============ NAVIGATION BAR ============ */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background: var(--white);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: var(--spacing-lg) 0;
+    backdrop-filter: blur(10px);
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 var(--spacing-2xl);
+    gap: var(--spacing-3xl);
+}
+
+.nav-left,
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2xl);
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    font-weight: 400;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-black);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Logo/Branding */
+.logo {
+    flex: 0 0 auto;
+    text-align: center;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* CTA Button */
+.cta-button {
+    padding: 0.65rem 1.4rem;
+    background: var(--primary-black);
+    color: var(--white);
+    border: none;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    aign-items: center;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+}
+
+.footer-logo {
+    animation: slideUpFade 0.8s ease-out;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+}
+
+.footer-logo-img {
+    height: 50px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cta-button:active {
+    transform: translateY(0);
+}
+
+.nav-cta {
+    padding: 0.65rem 1.4rem;
+    font-size: 0.9rem;
+}
+
+
+/* ================= SECTION ================= */
+
+.auth-section{
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 120px 80px 60px;
+    gap: 70px;
+}
+
+/* ================= LEFT ================= */
+
+.auth-left{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.auth-image-container{
+    width: 100%;
+    max-width: 650px;
+}
+
+.auth-image-container img{
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 30px;
+}
+
+/* ================= RIGHT ================= */
+
+.auth-right{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.auth-form-container{
+    width: 100%;
+    max-width: 520px;
+}
+
+.auth-title{
+    font-size: 58px;
+    line-height: 1.1;
+    font-weight: 400;
+    margin-bottom: 15px;
+}
+
+.auth-title-bold{
+    font-weight: 800;
+}
+
+.auth-subtitle{
+    font-size: 22px;
+    margin-bottom: 35px;
+    color: #444;
+}
+
+/* ================= FORM ================= */
+
+.auth-form{
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.form-group{
+    width: 100%;
+}
+
+.form-input{
+    width: 100%;
+    height: 68px;
+
+    border: none;
+    outline: none;
+
+    background: #e9e3e3;
+
+    border-radius: 18px;
+
+    padding: 0 22px;
+
+    font-size: 18px;
+    color: #000;
+}
+
+select.form-input{
+    cursor: pointer;
+}
+
+.auth-submit-button{
+    width: 100%;
+    height: 70px;
+
+    border: none;
+    border-radius: 18px;
+
+    background: #000;
+    color: #fff;
+
+    font-size: 22px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.auth-submit-button:hover{
+    transform: translateY(-2px);
+}
+
+/* ================= FOOTER ================= */
+
+.auth-footer{
+    margin-top: 30px;
+}
+
+.auth-footer-text{
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.auth-link{
+    color: #000;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.social-links{
+    display: flex;
+    gap: 18px;
+}
+
+.social-icon{
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #000;
+    color: #fff;
+
+    text-decoration: none;
+    font-size: 18px;
+
+    transition: 0.3s;
+}
+
+.social-icon:hover{
+    transform: translateY(-2px);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width: 1100px){
+
+    .auth-section{
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .auth-title{
+        font-size: 44px;
+    }
+
+    .auth-form-container{
+        max-width: 650px;
+    }
+
+    .social-links{
+        justify-content: center;
+    }
+}
+
+@media(max-width: 768px){
+
+    .navbar{
+        padding: 20px 25px;
+    }
+
+    .nav-container{
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .nav-left,
+    .nav-right{
+        gap: 25px;
+    }
+
+    .auth-section{
+        padding: 180px 25px 60px;
+    }
+
+    .auth-title{
+        font-size: 34px;
+    }
+
+    .auth-subtitle{
+        font-size: 18px;
+    }
+
+    .form-input{
+        height: 60px;
+        font-size: 16px;
+    }
+
+    .auth-submit-button{
+        height: 62px;
+        font-size: 18px;
+    }
+}
