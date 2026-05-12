@@ -15,11 +15,22 @@ if (!isset($_GET['id'])) {
 $user_id = $_SESSION['user_id'];
 $reservation_id = $_GET['id'];
 
+$studentSql = "SELECT student_id FROM tblstudent WHERE user_id = $1";
+$studentResult = pg_query_params($conn, $studentSql, [$user_id]);
+
+if (!$studentResult || pg_num_rows($studentResult) == 0) {
+    echo "Student account not found.";
+    exit();
+}
+
+$student = pg_fetch_assoc($studentResult);
+$student_id = $student['student_id'];
+
 $sql = "UPDATE tblreservation
         SET status = 'Cancelled'
-        WHERE reservation_id = $1 AND user_id = $2";
+        WHERE reservation_id = $1 AND student_id = $2";
 
-$result = pg_query_params($conn, $sql, [$reservation_id, $user_id]);
+$result = pg_query_params($conn, $sql, [$reservation_id, $student_id]);
 
 if ($result) {
     header("Location: ../test_screens/reservation_status.php");

@@ -29,8 +29,13 @@
     <!-- Main Auth Section -->
     <section class="auth-section register-section">
         <div class="auth-left">
-            <div class="auth-image-container">
-                <div class="auth-image-placeholder">Group Image</div>
+            <div class="auth-image-container" style="width: 650px; height: 650px; overflow: visible;">
+                <img 
+                    src="../assets/images/registerimg.png" 
+                    alt="Group Image" 
+                    class="auth-image"
+                    style="width: 1100px; max-width: none; height: auto;"
+                >
             </div>
         </div>
 
@@ -40,6 +45,51 @@
                 <p class="auth-subtitle">Create account</p>
 
                 <form class="auth-form" id="registerForm" action="../actions/register_action.php" method="POST">
+
+                    <div class="form-group">
+                        <input 
+                            type="text"
+                            name="firstname"
+                            class="form-input" 
+                            placeholder="First Name:" 
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <input 
+                            type="text"
+                            name="lastname"
+                            class="form-input" 
+                            placeholder="Last Name:" 
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <select 
+                            name="gender" 
+                            class="form-input" 
+                            required
+                        >
+                            <option value="" disabled selected>Gender:</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <input 
+                            type="text"
+                            name="mobile_number"
+                            class="form-input" 
+                            placeholder="Mobile Number:" 
+                            maxlength="11"
+                            required
+                        >
+                    </div>
+
                     <div class="form-group">
                         <input 
                             type="email"

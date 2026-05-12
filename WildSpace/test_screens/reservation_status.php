@@ -9,11 +9,26 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+$studentSql = "SELECT student_id FROM tblstudent WHERE user_id = $1";
+$studentResult = pg_query_params($conn, $studentSql, [$user_id]);
+
+if (!$studentResult) {
+    die("Query failed: " . pg_last_error($conn));
+}
+
+if (pg_num_rows($studentResult) == 0) {
+    echo "Student account not found.";
+    exit();
+}
+
+$student = pg_fetch_assoc($studentResult);
+$student_id = $student['student_id'];
+
 $sql = "SELECT * FROM tblreservation 
-        WHERE user_id = $1
+        WHERE student_id = $1
         ORDER BY date_created DESC";
 
-$result = pg_query_params($conn, $sql, [$user_id]);
+$result = pg_query_params($conn, $sql, [$student_id]);
 
 if (!$result) {
     die("Query failed: " . pg_last_error($conn));

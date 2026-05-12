@@ -23,12 +23,29 @@ if (isset($_POST['book_reservation'])) {
         exit();
     }
 
+    // Get student_id based on the logged-in user's user_id
+    $studentSql = "SELECT student_id FROM tblstudent WHERE user_id = $1";
+    $studentResult = pg_query_params($conn, $studentSql, [$user_id]);
+
+    if (!$studentResult) {
+        echo "Database error: " . pg_last_error($conn);
+        exit();
+    }
+
+    if (pg_num_rows($studentResult) == 0) {
+        echo "Student account not found. This user is not registered as a student.";
+        exit();
+    }
+
+    $student = pg_fetch_assoc($studentResult);
+    $student_id = $student['student_id'];
+
     $sql = "INSERT INTO tblreservation 
-            (user_id, status, reservation_date, capacity)
+            (student_id, status, reservation_date, capacity)
             VALUES ($1, $2, $3, $4)";
 
     $result = pg_query_params($conn, $sql, [
-        $user_id,
+        $student_id,
         $status,
         $reservation_date,
         $capacity
