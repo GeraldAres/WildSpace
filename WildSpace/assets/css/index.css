@@ -42,6 +42,17 @@ body {
     letter-spacing: -0.5px;
 }
 
+/* Hero WildSpace Text */
+.logo-section .logo-text {
+    font-size: 6rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -3px;
+    color: var(--text-dark);
+    animation: slideUpFade 0.8s ease-out;
+}
+
+
 /* ============ NAVIGATION BAR ============ */
 .navbar {
     position: fixed;
