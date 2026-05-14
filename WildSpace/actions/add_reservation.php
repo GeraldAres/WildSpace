@@ -59,4 +59,4 @@ if (isset($_POST['book_reservation'])) {
         exit();
     }
 }
-?>
+?>  
