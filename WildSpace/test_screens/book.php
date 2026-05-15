@@ -14,17 +14,17 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="#" class="nav-link">About Us</a>
+                <a href="index.php" class="nav-link">Home</a>
+                <a href="landingPage.php" class="nav-link">About Us</a>
             </div>
             
             <div class="logo">
-                <h1 class="logo-text">WildSpace</h1>
+                  <img src="../assets/images/wildspace_logo.png" alt="WildSpace Logo" class="footer-logo-img">
             </div>
             
             <div class="nav-right">
-                <a href="#" class="nav-link">Reservation</a>
-                <button class="cta-button nav-cta">Contact Us</button>
+                <a href="book.php" class="nav-link">Reservation</a>
+                <button class="cta-button nav-cta" onclick="location.href='book.php'">Contact Us</button>
             </div>
         </div>
     </nav>
