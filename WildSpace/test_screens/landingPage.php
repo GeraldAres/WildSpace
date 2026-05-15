@@ -11,8 +11,8 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
-                <a href="#" class="nav-link">Home</a>
-                <a href="#" class="nav-link">About Us</a>
+                <a href="index.php" class="nav-link">Home</a>
+                <a href="landingPage.php" class="nav-link">About Us</a>
             </div>
             
             <div class="logo">
@@ -22,8 +22,8 @@
             </div>
             
             <div class="nav-right">
-                <a href="#" class="nav-link">Reservation</a>
-                <button class="cta-button">Contact Us</button>
+                <a href="book.php" class="nav-link">Reservation</a>
+                <button class="cta-button" onclick="location.href='book.php'">Contact Us</button>
             </div>
         </div>
     </nav>
@@ -39,7 +39,7 @@
         <div class="hero-right">
             <h2 class="hero-title">Study without the hassle of finding a space.</h2>
             <p class="hero-subtitle">The easiest way to claim your study spot on campus.</p>
-            <button class="cta-button cta-primary">Get Started ></button>
+            <button class="cta-button cta-primary" onclick="location.href='book.php'">Get Started ></button>
         </div>
     </section>
 
@@ -50,7 +50,7 @@
             <p class="page2-description">
                 Easily locate and reserve study spaces across CIT-U with a streamlined system designed to reduce conflicts, save time, and improve collaboration.
             </p>
-            <button class="cta-button page2-cta">Book Now</button>
+            <button class="cta-button page2-cta" onclick="location.href='book.php'">Book Now</button>
         </div>
 
         <div class="page2-right">

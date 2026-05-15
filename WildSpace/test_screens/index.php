@@ -11,8 +11,8 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
-                <a href="#" class="nav-link">Home</a>
-                <a href="#" class="nav-link">About Us</a>
+                <a href="index.php" class="nav-link">Home</a>
+                <a href="landingPage.php" class="nav-link">About Us</a>
             </div>
             
             <div class="logo">
@@ -22,8 +22,8 @@
             </div>
             
             <div class="nav-right">
-                <a href="#" class="nav-link">Reservation</a>
-                <button class="cta-button">Contact Us</button>
+                <a href="book.php" class="nav-link">Reservation</a>
+                <button class="cta-button" onclick="location.href='book.php'">Contact Us</button>
             </div>
         </div>
     </nav>
@@ -34,7 +34,7 @@
                 <div class="logo-section">
                     <img src="../assets/images/wildspace_logo.png" alt="WildSpace Logo" class="hero-logo-img">
                 </div>
-                <button onclick="location.href='login.php'" class="cta-button cta-primary">Get Started ></button>
+                <button onclick="location.href='landingPage.php'" class="cta-button cta-primary">Get Started ></button>
             </div>
         </div>
 
