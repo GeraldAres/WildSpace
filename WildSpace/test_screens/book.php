@@ -24,7 +24,7 @@
             
             <div class="nav-right">
                 <a href="book.php" class="nav-link">Reservation</a>
-                <button class="cta-button nav-cta" onclick="location.href='book.php'">Contact Us</button>
+                <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
             </div>
         </div>
     </nav>

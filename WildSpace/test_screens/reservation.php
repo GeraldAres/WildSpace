@@ -30,7 +30,7 @@ if (!isset($_SESSION['user_id'])) {
 
             <div class="nav-right">
                 <a href="reservation.php" class="nav-link">Reservation</a>
-                <button class="cta-button nav-cta">Contact Us</button>
+                <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
             </div>
         </div>
     </nav>
