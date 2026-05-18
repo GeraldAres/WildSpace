@@ -42,7 +42,7 @@ if (isset($_POST['login'])) {
                 $_SESSION['role'] = "user";
             }
 
-            header("Location: ../test_screens/admin_reservations.php");
+            header("Location: ../client_side/admin_reservations.php");
             exit();
         } else {
             echo "Incorrect password.";
@@ -53,7 +53,7 @@ if (isset($_POST['login'])) {
         exit();
     }
 } else {
-    header("Location: ../test_screens/login.php");
+    header("Location: ../client_side/login.php");
     exit();
 }
 ?>
