@@ -101,25 +101,10 @@
 
             </div>
 
-            <p class="role-hint" id="roleHint" aria-live="polite" role="status">
-                <span class="role-hint-text role-hint-text--student">
-                    Selected: Student — book study spaces
-                </span>
-                <span class="role-hint-text role-hint-text--admin">
-                    Selected: Admin — Manage Reservations
-                </span>
-            </p>
-
-            <!-- FIRST NAME -->
-            <div class="form-group">
-                <input
-                    type="text"
-                    name="firstname"
-                    class="form-input"
-                    placeholder="First Name:"
-                    required
-                >
-            </div>
+            <form class="auth-form" id="registerForm" action="../actions/register_action.php" method="POST" novalidate>
+                <div class="form-group">
+                    <input type="text" name="firstname" class="form-input" placeholder="First Name:" required>
+                </div>
 
             <!-- LAST NAME -->
             <div class="form-group">
@@ -181,36 +166,13 @@
                 >
             </div>
 
-            <!-- CONFIRM PASSWORD -->
-            <div class="form-group">
-                <input
-                    type="password"
-                    name="confirm_password"
-                    class="form-input"
-                    placeholder="Confirm Password:"
-                    required
-                >
-            </div>
+                <div class="form-group">
+                    <input type="password" name="confirm_password" class="form-input" placeholder="Confirm Password:" required>
+                    <div id="registerMessage" class="auth-message" role="alert" aria-live="polite" hidden></div>
+                </div>
 
-            <!-- MESSAGE -->
-            <div
-                id="registerMessage"
-                class="auth-message"
-                hidden
-            ></div>
-
-            <!-- BUTTON -->
-            <button
-                type="submit"
-                name="register"
-                value="1"
-                id="registerSubmit"
-                class="auth-submit-button"
-            >
-                Create Account
-            </button>
-
-        </form>
+                <button type="button" id="registerSubmit" class="auth-submit-button">Create Account</button>
+            </form>
 
         <!-- ================= FOOTER ================= -->
         <div class="auth-footer">
