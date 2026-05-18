@@ -28,6 +28,7 @@ if (isset($_POST['login'])) {
         $_SESSION['user_id'] = 0;
         $_SESSION['email'] = $email;
         $_SESSION['role'] = "admin";
+        $_SESSION['admin_id'] = 0;
 
         header("Location: ../client_side/admin_reservations.php");
         exit();
@@ -51,12 +52,22 @@ if (isset($_POST['login'])) {
         $user = pg_fetch_assoc($result);
 
         if (password_verify($password, $user['password'])) {
-
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['email'] = $user['email'];
-            $_SESSION['role'] = "user";
 
-            header("Location: ../client_side/admin_reservations.php");
+            $adminCheckSql = "SELECT admin_id FROM tbladmin WHERE user_id = $1";
+            $adminCheckResult = pg_query_params($conn, $adminCheckSql, [$user['user_id']]);
+
+            if ($adminCheckResult && pg_num_rows($adminCheckResult) === 1) {
+                $adminRow = pg_fetch_assoc($adminCheckResult);
+                $_SESSION['role'] = "admin";
+                $_SESSION['admin_id'] = $adminRow['admin_id'];
+                header("Location: ../client_side/admin_reservations.php");
+                exit();
+            }
+
+            $_SESSION['role'] = "user";
+            header("Location: ../client_side/index.php");
             exit();
 
         } else {
@@ -70,7 +81,7 @@ if (isset($_POST['login'])) {
     }
 
 } else {
-    header("Location: ../client_side/admin_reservations.php");
+    header("Location: ../client_side/login.php");
     exit();
 }
 ?>
