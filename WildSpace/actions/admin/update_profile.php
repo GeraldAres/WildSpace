@@ -3,12 +3,12 @@ session_start();
 include '../../database/connection.php';
 
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin_id'])) {
-    header("Location: ../../test_screens/login.php");
+    header("Location: ../../client_side/login.php");
     exit();
 }
 
 if (!isset($_POST['update_profile'])) {
-    header("Location: ../../test_screens/edit_profile.php");
+    header("Location: ../../client_side/edit_profile.php");
     exit();
 }
 
@@ -76,7 +76,7 @@ $result = pg_query_params($conn, $sql, [
 ]);
 
 if ($result) {
-    header("Location: ../../test_screens/admin_reservations.php");
+    header("Location: ../../client_side/admin_reservations.php");
     exit();
 } else {
     echo "Failed to update profile: " . pg_last_error($conn);
