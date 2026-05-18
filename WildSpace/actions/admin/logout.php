@@ -4,6 +4,6 @@ session_start();
 session_unset();
 session_destroy();
 
-header("Location: ../../test_screens/login.php");
+header("Location: ../../client_side/login.php");
 exit();
 ?>

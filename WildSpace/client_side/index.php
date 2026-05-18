@@ -34,7 +34,7 @@
                 <div class="logo-section">
                     <img src="../assets/images/wildspace_logo.png" alt="WildSpace Logo" class="hero-logo-img">
                 </div>
-                <button onclick="location.href='landingPage.php'" class="cta-button cta-primary">Get Started ></button>
+                <button onclick="location.href='login.php'" class="cta-button cta-primary">Get Started ></button>
             </div>
         </div>
 

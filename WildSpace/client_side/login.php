@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,11 +33,19 @@
     <main class="auth-wrapper">
         <div class="login-card" id="loginCard">
             <div class="login-header">
-                <h1 class="auth-title">Your <span>productive</span> starts with us</h1>
+                <h1 class="auth-title">Your <span>productivity</span> starts with us</h1>
                 <p class="auth-subtitle">Log in</p>
             </div>
 
             <form class="auth-form" id="loginForm" action="../actions/login_action.php" method="POST">
+                                <?php if (isset($_SESSION['login_error'])) { ?>
+                    <div class="auth-message auth-message--error">
+                        <?php 
+                            echo htmlspecialchars($_SESSION['login_error']); 
+                            unset($_SESSION['login_error']);
+                        ?>
+                    </div>
+                <?php } ?>
                 <div class="form-group">
                     <input type="email" name="email" id="email" class="form-input" placeholder="Educational Email:" required>
                 </div>
