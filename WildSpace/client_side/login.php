@@ -27,7 +27,6 @@ session_start();
         </div>
     </nav>
 
-    <!-- Background Image Element -->
     <img src="../assets/images/bg_login.jpg" alt="Background Image" class="background-image">
 
     <main class="auth-wrapper">
@@ -38,20 +37,37 @@ session_start();
             </div>
 
             <form class="auth-form" id="loginForm" action="../actions/login_action.php" method="POST">
-                                <?php if (isset($_SESSION['login_error'])) { ?>
-                    <div class="auth-message auth-message--error">
+
+                <?php if (isset($_SESSION['login_success'])) { ?>
+                    <div class="auth-message auth-message--success" id="loginMessage">
+                        <?php 
+                            echo htmlspecialchars($_SESSION['login_success']); 
+                            unset($_SESSION['login_success']);
+                        ?>
+                    </div>
+                <?php } ?>
+
+                <?php if (isset($_SESSION['login_error'])) { ?>
+                    <div class="auth-message auth-message--error" id="loginMessage">
                         <?php 
                             echo htmlspecialchars($_SESSION['login_error']); 
                             unset($_SESSION['login_error']);
                         ?>
                     </div>
                 <?php } ?>
+
                 <div class="form-group">
                     <input type="email" name="email" id="email" class="form-input" placeholder="Educational Email:" required>
                 </div>
+
                 <div class="form-group">
                     <input type="password" name="password" id="password" class="form-input" placeholder="Password:" required>
                 </div>
+
+                <p class="footer-text" style="text-align: right; margin-top: -10px;">
+                    <a href="forgot_password.php">Forgot Password?</a>
+                </p>
+
                 <button type="submit" name="login" class="auth-submit-button">Log In</button>
             </form>
 
@@ -66,6 +82,15 @@ session_start();
             </div>
         </div>
     </main>
+
+    <script>
+        setTimeout(() => {
+            const message = document.getElementById("loginMessage");
+            if (message) {
+                message.style.display = "none";
+            }
+        }, 3000);
+    </script>
 
     <script src="../assets/js/auth.js"></script>
 </body>
