@@ -107,15 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const data = await response.json();
 
-            if (data.success) {
-                showMessage("success", data.message);
-                registerForm.reset();
-                const studentRadio = document.getElementById("roleStudent");
-                if (studentRadio) {
-                    studentRadio.checked = true;
-                    updateRoleHint("student");
-                }
-            } else {
+if (data.success) {
+    showMessage("success", data.message);
+
+    setTimeout(() => {
+        window.location.href = data.redirect;
+    }, 1000);
+}else {
                 showMessage("error", data.message);
             }
         } catch {
