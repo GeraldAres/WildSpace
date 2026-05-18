@@ -3,12 +3,12 @@ session_start();
 include '../../database/connection.php';
 
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin_id'])) {
-    header("Location: ../../test_screens/login.php");
+    header("Location: ../../client_side/login.php");
     exit();
 }
 
 if (!isset($_GET['id'])) {
-    header("Location: ../../test_screens/admin_reservations.php");
+    header("Location: ../../client_side/admin_reservations.php?view=requests");
     exit();
 }
 
@@ -19,7 +19,7 @@ $sql = "DELETE FROM tblreservation WHERE reservation_id = $1";
 $result = pg_query_params($conn, $sql, [$reservation_id]);
 
 if ($result) {
-    header("Location: ../../test_screens/admin_reservations.php");
+    header("Location: ../../client_side/admin_reservations.php?view=requests");
     exit();
 } else {
     echo "Failed to delete reservation: " . pg_last_error($conn);
