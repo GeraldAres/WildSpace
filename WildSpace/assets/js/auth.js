@@ -1,98 +1,131 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const loginCard = document.getElementById('loginCard');
+document.addEventListener("DOMContentLoaded", () => {
+    const roleSelector = document.querySelector(".role-selector");
+    const roleHint = document.getElementById("roleHint");
 
-    if (loginForm && loginCard) {
-        loginForm.addEventListener('submit', (e) => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+    const roleLabels = {
+        student: {
+            hint: "Selected: Student — book study spaces",
+            hintClass: "is-student",
+        },
+        admin: {
+            hint: "Selected: Admin — Manage Reservations",
+            hintClass: "is-admin",
+        },
+    };
 
-            if (!email || !password) {
-                e.preventDefault();
+    function updateRoleHint(role) {
+        if (!roleHint || !roleLabels[role]) {
+            return;
+        }
 
-                loginCard.style.animation = 'shake 0.4s ease-in-out';
+        const { hint, hintClass } = roleLabels[role];
+        roleHint.setAttribute("data-selected-role", role);
 
-                setTimeout(() => {
-                    loginCard.style.animation = '';
-                }, 400);
+        /* Keeps #roleHint accessible text in sync for screen readers */
+        roleHint.setAttribute("aria-label", hint);
 
-                return;
-            }
-
-            const btn = loginForm.querySelector('.auth-submit-button');
-            btn.innerText = 'Logging in...';
-            btn.style.opacity = '0.7';
-        });
+        roleHint.classList.remove("is-student", "is-admin");
+        roleHint.classList.add(hintClass);
     }
 
-    const registerForm = document.getElementById('registerForm');
-    const registerSubmit = document.getElementById('registerSubmit');
-    const registerMessage = document.getElementById('registerMessage');
+    function syncRoleHintFromDom() {
+        if (!roleSelector) {
+            return;
+        }
 
-    if (registerForm && registerSubmit && registerMessage) {
-        const defaultButtonText = registerSubmit.textContent;
+        const checked = roleSelector.querySelector(
+            'input[type="radio"][name="role"]:checked'
+        );
 
-        const showRegisterMessage = (type, text) => {
-            registerMessage.textContent = text;
-            registerMessage.hidden = false;
-            registerMessage.classList.remove('auth-message--error', 'auth-message--success');
-            registerMessage.classList.add(type === 'success' ? 'auth-message--success' : 'auth-message--error');
-        };
+        if (checked) {
+            updateRoleHint(checked.value);
+        }
+    }
 
-        const hideRegisterMessage = () => {
-            registerMessage.hidden = true;
-            registerMessage.textContent = '';
-            registerMessage.classList.remove('auth-message--error', 'auth-message--success');
-        };
+    if (roleSelector) {
+        const roleRadios = roleSelector.querySelectorAll(
+            'input[type="radio"][name="role"]'
+        );
 
-        const handleRegister = async () => {
-            hideRegisterMessage();
-
-            registerSubmit.disabled = true;
-            registerSubmit.textContent = 'Creating account...';
-            registerSubmit.style.opacity = '0.7';
-
-            try {
-                const formData = new FormData(registerForm);
-                formData.append('register', '1');
-
-                const response = await fetch(registerForm.action, {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showRegisterMessage('success', data.message);
-                    registerForm.reset();
-                } else {
-                    showRegisterMessage('error', data.message);
+        roleRadios.forEach((radio) => {
+            radio.addEventListener("change", () => {
+                if (radio.checked) {
+                    updateRoleHint(radio.value);
                 }
-            } catch {
-                showRegisterMessage('error', 'Something went wrong. Please try again.');
-            } finally {
-                registerSubmit.disabled = false;
-                registerSubmit.textContent = defaultButtonText;
-                registerSubmit.style.opacity = '1';
-            }
-        };
+            });
 
-        registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleRegister();
+            radio.addEventListener("click", () => {
+                if (radio.checked) {
+                    updateRoleHint(radio.value);
+                }
+            });
         });
 
-        registerSubmit.addEventListener('click', handleRegister);
-    }
-});
+        roleSelector.addEventListener("click", () => {
+            queueMicrotask(syncRoleHintFromDom);
+        });
 
-const style = document.createElement('style');
-style.innerHTML = `
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-8px); }
-        75% { transform: translateX(8px); }
+        syncRoleHintFromDom();
     }
-`;
-document.head.appendChild(style);
+
+    const registerForm = document.getElementById("registerForm");
+    const registerMessage = document.getElementById("registerMessage");
+    const registerSubmit = document.getElementById("registerSubmit");
+
+    if (!registerForm) {
+        return;
+    }
+
+    const showMessage = (type, text) => {
+        registerMessage.hidden = false;
+        registerMessage.textContent = text;
+        registerMessage.classList.remove(
+            "auth-message--error",
+            "auth-message--success"
+        );
+        registerMessage.classList.add(
+            type === "success"
+                ? "auth-message--success"
+                : "auth-message--error"
+        );
+    };
+
+    registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        registerSubmit.disabled = true;
+        registerSubmit.textContent = "Creating account...";
+
+        try {
+            const formData = new FormData(registerForm);
+            formData.append("register", "1");
+
+            const response = await fetch(registerForm.action, {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showMessage("success", data.message);
+                registerForm.reset();
+                const studentRadio = document.getElementById("roleStudent");
+                if (studentRadio) {
+                    studentRadio.checked = true;
+                    updateRoleHint("student");
+                }
+            } else {
+                showMessage("error", data.message);
+            }
+        } catch {
+            showMessage(
+                "error",
+                "Something went wrong. Please try again."
+            );
+        }
+
+        registerSubmit.disabled = false;
+        registerSubmit.textContent = "Create Account";
+    });
+});
