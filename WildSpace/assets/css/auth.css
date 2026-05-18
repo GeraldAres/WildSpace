@@ -141,6 +141,31 @@ select.form-input {
     color: #fff;
 }
 
+.form-group .auth-message {
+    margin-top: 0.4rem;
+}
+
+.auth-message {
+    padding: 0.65rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: left;
+    line-height: 1.4;
+}
+
+.auth-message--error {
+    background: #fdecea;
+    color: #b42318;
+    border: 1px solid #f5c2c0;
+}
+
+.auth-message--success {
+    background: #e8f7ee;
+    color: #1a7f3c;
+    border: 1px solid #a8e0bc;
+}
+
 /* ============ FOOTER ============ */
 .auth-footer { margin-top: 1.5rem; }
 .footer-text { font-size: 0.9rem; color: var(--text-gray); }
