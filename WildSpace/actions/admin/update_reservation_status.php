@@ -3,32 +3,37 @@ session_start();
 include '../../database/connection.php';
 
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin_id'])) {
-    header('Location: ../../client_side/login.php');
+    header("Location: ../../client_side/login.php");
     exit();
 }
 
-if (!isset($_GET['id'], $_GET['status'])) {
-    header('Location: ../../client_side/admin_reservations.php?view=requests');
+if (!isset($_GET['id']) || !isset($_GET['status'])) {
+    header("Location: ../../client_side/admin_reservations.php?view=requests");
     exit();
 }
 
-$reservation_id = (int) $_GET['id'];
+$reservation_id = $_GET['id'];
 $status = $_GET['status'];
+$admin_id = $_SESSION['admin_id'];
 
-$allowed = ['Approved', 'Rejected', 'Pending'];
+$allowedStatuses = ['Approved', 'Rejected'];
 
-if (!in_array($status, $allowed, true)) {
-    header('Location: ../../client_side/admin_reservations.php?view=requests');
+if (!in_array($status, $allowedStatuses)) {
+    header("Location: ../../client_side/admin_reservations.php?view=requests");
     exit();
 }
 
-$sql = 'UPDATE tblreservation SET status = $1 WHERE reservation_id = $2';
-$result = pg_query_params($conn, $sql, [$status, $reservation_id]);
+$sql = "UPDATE tblreservation
+        SET status = $1,
+            admin_id = $2
+        WHERE reservation_id = $3";
 
-if (!$result) {
-    echo 'Failed to update reservation: ' . pg_last_error($conn);
-    exit();
-}
+$result = pg_query_params($conn, $sql, [
+    $status,
+    $admin_id,
+    $reservation_id
+]);
 
-header('Location: ../../client_side/admin_reservations.php?view=requests');
+header("Location: ../../client_side/admin_reservations.php?view=requests");
 exit();
+?>

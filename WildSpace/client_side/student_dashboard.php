@@ -522,10 +522,13 @@ if (isset($_POST['create_reservation'])) {
                                             </td>
                                             <td class="muted">
                                                 <?php
-                                                    if ($row['status'] === 'Approved' && !empty($row['admin_firstname'])) {
+                                                                                                        if (
+                                                        ($row['status'] === 'Approved' || $row['status'] === 'Rejected') &&
+                                                        !empty($row['admin_firstname'])
+                                                    ) {
                                                         echo htmlspecialchars(trim($row['admin_firstname'] . ' ' . $row['admin_lastname']));
                                                     } else {
-                                                        echo "Not yet approved";
+                                                        echo "Not yet reviewed";
                                                     }
                                                 ?>
                                             </td>
