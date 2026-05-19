@@ -67,22 +67,6 @@
         </div>
     </section>
 
-    <!-- Section 4 -->
-    <section class="section4">
-        <div class="section4-left">
-            <!-- Person3 image will be added here -->
-            <img src="../assets/images/person3.png" alt="Student" class="section4-image">
-        </div>
-
-        <div class="section4-right">
-            <h2 class="section4-title">Reserve. Study. <span class="section4-highlight">Succeed.</span></h2>
-            <p class="section4-subtitle">Ycia & Rald Co</p>
-            <p class="section4-description">
-                Every student deserves easy access to spaces that support learning, collaboration, and productivity.
-            </p>
-        </div>
-    </section>
-
     <!-- Section 5 -->
     <section class="section5">
         <div class="section5-container">
