@@ -10,8 +10,7 @@
     $student_id = $_SESSION['student_id'];
     $message = "";
     $messageType = "";
-
-    /* CREATE RESERVATION */
+    
 /* CREATE RESERVATION */
 if (isset($_POST['create_reservation'])) {
     $reservation_date = trim($_POST['reservation_date'] ?? '');
