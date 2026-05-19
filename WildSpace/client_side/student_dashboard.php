@@ -25,8 +25,11 @@ if (isset($_POST['create_reservation'])) {
         $message = "You cannot reserve a past date.";
         $messageType = "error";
     } elseif (!preg_match('/^[0-9]+$/', $capacity) || (int)$capacity <= 0) {
-        $message = "Seats must be a valid number.";
-        $messageType = "error";
+    $message = "Seats must be a valid number.";
+    $messageType = "error";
+        } elseif ((int)$capacity > 10) {
+            $message = "A reservation can only accommodate up to 10 seats.";
+            $messageType = "error";
     } else {
         $insertSql = "INSERT INTO tblreservation 
                         (student_id, admin_id, status, reservation_date, date_created, capacity)
@@ -48,8 +51,6 @@ if (isset($_POST['create_reservation'])) {
         }
     }
 }
-$message = "";
-$messageType = "";
 
     /* MONTH FILTER */
     $currentMonth = $_GET['month'] ?? date('Y-m');
@@ -401,6 +402,7 @@ $messageType = "";
     transform: none;
     opacity: 0.75;
 }
+
         </style>
     </head>
 
@@ -454,11 +456,11 @@ $messageType = "";
 
                 <section class="admin-panel active">
                     <header class="dashboard-header">
-                        <div class="dashboard-title">
-                            <h1>My Reservations</h1>
-                            <p>View your study space booking requests and approval status.</p>
-                        </div>
-                    </header>
+    <div class="dashboard-title">
+        <h1>My Reservations</h1>
+        <p>View your study space booking requests and approval status.</p>
+    </div>
+</header>
 
                     <section class="summary-cards">
                         <div class="summary-card">
@@ -568,7 +570,7 @@ $messageType = "";
 
                             <div class="form-group">
                                 <label>Seats</label>
-                                <input type="number" name="capacity" class="form-input" min="1" required>
+                                <input type="number" name="capacity" class="form-input" min="1" max="10" required>
                             </div>
 
                             <button type="submit" name="create_reservation" class="submit-btn">
