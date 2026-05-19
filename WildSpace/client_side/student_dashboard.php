@@ -356,12 +356,11 @@ while ($row = pg_fetch_assoc($violationsResult)) {
                 }
             }
 
-                    .status-pending,
-            .calendar-reservation.status-pending {
-                background: #eeeeee;
-                color: #555555;
-            }
-
+            .status-pending,
+.calendar-reservation.status-pending {
+    background: #fff4d8;
+    color: #9a650f;
+}
             .status-approved,
             .calendar-reservation.status-approved {
                 background: #e8f7ee;
@@ -474,6 +473,31 @@ while ($row = pg_fetch_assoc($violationsResult)) {
 
 .violations-table .col-marked {
     width: 15%;
+}
+
+.action-btn {
+    display: inline-block;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-weight: 800;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background: #000;
+    color: #fff;
+}
+
+.approve-btn {
+    background: #e8f7ee;
+    color: #0f8a3b;
+}
+
+.reject-btn {
+    background: #fdecec;
+    color: #a32618;
 }
         </style>
     </head>
@@ -614,10 +638,10 @@ while ($row = pg_fetch_assoc($violationsResult)) {
                                             <!-- ADD THIS ACTION COLUMN -->
                                             <td>
                                                 <a class="action-btn delete-btn"
-                                                href="../actions/student/delete_reservation.php?id=<?php echo urlencode($row['reservation_id']); ?>"
-                                                onclick="return confirm('Are you sure you want to delete this reservation?');">
-                                                    Delete
-                                                </a>
+                                                    href="../actions/student/delete_reservation.php?id=<?php echo urlencode($row['reservation_id']); ?>"
+                                                    onclick="return confirm('Are you sure you want to delete this reservation?');">
+                                                        Delete
+                                                    </a>
                                             </td>
                                         </tr>
                                     <?php } ?>
