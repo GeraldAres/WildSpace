@@ -85,8 +85,8 @@ if (isset($_POST['create_reservation'])) {
                 INNER JOIN tbluser student_user ON s.user_id = student_user.user_id
                 WHERE r.reservation_date BETWEEN $1 AND $2
                 AND (
-                    r.student_id = $3
-                    OR r.status = 'Approved'
+                    r.status = 'Approved'
+                    OR (r.student_id = $3 AND r.status = 'Pending')
                 )
                 ORDER BY r.reservation_date ASC";
 
