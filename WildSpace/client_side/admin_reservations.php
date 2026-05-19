@@ -84,6 +84,15 @@ while ($row = pg_fetch_assoc($requestsResult)) {
     }
 }
 
+function formatReadableDate(?string $date): string
+{
+    if (empty($date)) {
+        return "Not available";
+    }
+
+    return date("F j, Y", strtotime($date));
+}
+
 function reservationStatusClass(string $status): string
 {
     if ($status === 'Approved') {
@@ -106,6 +115,8 @@ function reservationStatusClass(string $status): string
     <title>WildSpace - Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/admin-dashboard.css">
+
+    
 </head>
 <body>
 
@@ -296,14 +307,14 @@ function reservationStatusClass(string $status): string
                                         <div class="muted"><?php echo htmlspecialchars($row['email']); ?></div>
                                     </td>
                                     <td class="muted"><?php echo htmlspecialchars($row['mobile_number']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['reservation_date']); ?></td>
+                                    <td><?php echo htmlspecialchars(formatReadableDate($row['reservation_date'])); ?></td>
                                     <td><?php echo htmlspecialchars($row['capacity']); ?> seats</td>
                                     <td>
                                         <span class="status-badge <?php echo $statusClass; ?>">
                                             <?php echo htmlspecialchars($row['status']); ?>
                                         </span>
                                     </td>
-                                    <td class="muted"><?php echo htmlspecialchars($row['date_created']); ?></td>
+                                    <td class="muted"><?php echo htmlspecialchars(formatReadableDate($row['date_created'])); ?></td>
                                     <td>
                                         <div class="actions">
                                             <?php if ($row['status'] === 'Pending') { ?>
