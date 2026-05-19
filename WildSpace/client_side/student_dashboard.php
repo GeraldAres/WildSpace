@@ -12,37 +12,45 @@
     $messageType = "";
 
     /* CREATE RESERVATION */
-    if (isset($_POST['create_reservation'])) {
-        $reservation_date = trim($_POST['reservation_date'] ?? '');
-        $capacity = trim($_POST['capacity'] ?? '');
+/* CREATE RESERVATION */
+if (isset($_POST['create_reservation'])) {
+    $reservation_date = trim($_POST['reservation_date'] ?? '');
+    $capacity = trim($_POST['capacity'] ?? '');
+    $today = date('Y-m-d');
 
-        if (empty($reservation_date) || empty($capacity)) {
-            $message = "Please fill out all reservation fields.";
+    if (empty($reservation_date) || empty($capacity)) {
+        $message = "Please fill out all reservation fields.";
+        $messageType = "error";
+    } elseif ($reservation_date < $today) {
+        $message = "You cannot reserve a past date.";
+        $messageType = "error";
+    } elseif (!preg_match('/^[0-9]+$/', $capacity) || (int)$capacity <= 0) {
+    $message = "Seats must be a valid number.";
+    $messageType = "error";
+        } elseif ((int)$capacity > 10) {
+            $message = "A reservation can only accommodate up to 10 seats.";
             $messageType = "error";
-        } elseif (!preg_match('/^[0-9]+$/', $capacity) || (int)$capacity <= 0) {
-            $message = "Capacity must be a valid number.";
-            $messageType = "error";
+    } else {
+        $insertSql = "INSERT INTO tblreservation 
+                        (student_id, admin_id, status, reservation_date, date_created, capacity)
+                    VALUES 
+                        ($1, NULL, 'Pending', $2, NOW(), $3)";
+
+        $insertResult = pg_query_params($conn, $insertSql, [
+            $student_id,
+            $reservation_date,
+            $capacity
+        ]);
+
+        if ($insertResult) {
+            $message = "Reservation request submitted successfully.";
+            $messageType = "success";
         } else {
-            $insertSql = "INSERT INTO tblreservation 
-                            (student_id, admin_id, status, reservation_date, date_created, capacity)
-                        VALUES 
-                            ($1, NULL, 'Pending', $2, NOW(), $3)";
-
-            $insertResult = pg_query_params($conn, $insertSql, [
-                $student_id,
-                $reservation_date,
-                $capacity
-            ]);
-
-            if ($insertResult) {
-                $message = "Reservation request submitted successfully.";
-                $messageType = "success";
-            } else {
-                $message = "Failed to create reservation: " . pg_last_error($conn);
-                $messageType = "error";
-            }
+            $message = "Failed to create reservation: " . pg_last_error($conn);
+            $messageType = "error";
         }
     }
+}
 
     /* MONTH FILTER */
     $currentMonth = $_GET['month'] ?? date('Y-m');
@@ -394,6 +402,7 @@
     transform: none;
     opacity: 0.75;
 }
+
         </style>
     </head>
 
@@ -447,11 +456,11 @@
 
                 <section class="admin-panel active">
                     <header class="dashboard-header">
-                        <div class="dashboard-title">
-                            <h1>My Reservations</h1>
-                            <p>View your study space booking requests and approval status.</p>
-                        </div>
-                    </header>
+    <div class="dashboard-title">
+        <h1>My Reservations</h1>
+        <p>View your study space booking requests and approval status.</p>
+    </div>
+</header>
 
                     <section class="summary-cards">
                         <div class="summary-card">
@@ -487,16 +496,17 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>Date</th>
-                                        <th>Capacity</th>
+                                        <th>Seats</th>
                                         <th>Status</th>
-                                        <th>Approved By</th>
+                                        <th>Approved/Rejected By</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
                                     <?php if (count($reservations) === 0) { ?>
                                         <tr>
-                                            <td colspan="5" class="muted">You have no reservations yet.</td>
+                                            <td colspan="6" class="muted">You have no reservations yet.</td>
                                         </tr>
                                     <?php } ?>
 
@@ -511,14 +521,26 @@
                                                 </span>
                                             </td>
                                             <td class="muted">
-        <?php
-            if ($row['status'] === 'Approved' && !empty($row['admin_firstname'])) {
-                echo htmlspecialchars(trim($row['admin_firstname'] . ' ' . $row['admin_lastname']));
-            } else {
-                echo "Not yet approved";
-            }
-        ?>
-    </td>
+                                                <?php
+                                                                                                        if (
+                                                        ($row['status'] === 'Approved' || $row['status'] === 'Rejected') &&
+                                                        !empty($row['admin_firstname'])
+                                                    ) {
+                                                        echo htmlspecialchars(trim($row['admin_firstname'] . ' ' . $row['admin_lastname']));
+                                                    } else {
+                                                        echo "Not yet reviewed";
+                                                    }
+                                                ?>
+                                            </td>
+
+                                            <!-- ADD THIS ACTION COLUMN -->
+                                            <td>
+                                                <a class="action-btn delete-btn"
+                                                href="../actions/student/delete_reservation.php?id=<?php echo urlencode($row['reservation_id']); ?>"
+                                                onclick="return confirm('Are you sure you want to delete this reservation?');">
+                                                    Delete
+                                                </a>
+                                            </td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>
@@ -546,12 +568,12 @@
                         <form method="POST" class="reservation-form">
                             <div class="form-group">
                                 <label>Reservation Date</label>
-                                <input type="date" name="reservation_date" class="form-input" required>
+                                <input type="date" name="reservation_date" class="form-input" min="<?php echo date('Y-m-d'); ?>" required>
                             </div>
 
                             <div class="form-group">
-                                <label>Capacity</label>
-                                <input type="number" name="capacity" class="form-input" min="1" required>
+                                <label>Seats</label>
+                                <input type="number" name="capacity" class="form-input" min="1" max="10" required>
                             </div>
 
                             <button type="submit" name="create_reservation" class="submit-btn">
@@ -597,10 +619,11 @@
         ?>
 
         <?php if ($isOwnReservation) { ?>
-            <button
+         <button
                 type="button"
                 class="calendar-reservation <?php echo reservationStatusClass($reservation['status']); ?>"
                 data-id="<?php echo htmlspecialchars($reservation['reservation_id']); ?>"
+                data-student-name="<?php echo htmlspecialchars(trim($reservation['student_firstname'] . ' ' . $reservation['student_lastname'])); ?>"
                 data-date="<?php echo htmlspecialchars(formatReadableDate($reservation['reservation_date'])); ?>"
                 data-capacity="<?php echo htmlspecialchars($reservation['capacity']); ?>"
                 data-status="<?php echo htmlspecialchars($reservation['status']); ?>"
@@ -618,7 +641,7 @@
         <?php } else { ?>
 <div class="calendar-reservation other-approved" title="Approved reservation by another student">
     <?php echo htmlspecialchars(trim($reservation['student_firstname'] . ' ' . $reservation['student_lastname'])); ?><br>
-    <?php echo htmlspecialchars($reservation['capacity']); ?> seats - Approved
+    <?php echo htmlspecialchars($reservation['capacity']); ?> seats
 </div>
         <?php } ?>
 
@@ -640,10 +663,10 @@
     <div class="modal-overlay" id="reservationModal">
         <div class="modal-card">
             <h2>Reservation Details</h2>
-
+            <p><strong>Student Name:</strong> <span id="modalStudentName"></span></p>
             <p><strong>Reservation ID:</strong> <span id="modalReservationId"></span></p>
             <p><strong>Date:</strong> <span id="modalDate"></span></p>
-            <p><strong>Capacity:</strong> <span id="modalCapacity"></span> seats</p>
+            <p><strong>Seats:</strong> <span id="modalCapacity"></span> seats</p>
             <p><strong>Status:</strong> <span id="modalStatus"></span></p>
             <p><strong>Approved By:</strong> <span id="modalApprovedBy"></span></p>
 
@@ -665,6 +688,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll("button.calendar-reservation").forEach((pill) => {
         pill.addEventListener("click", () => {
+            document.getElementById("modalStudentName").textContent = pill.dataset.studentName;
             document.getElementById("modalReservationId").textContent = pill.dataset.id;
             document.getElementById("modalDate").textContent = pill.dataset.date;
             document.getElementById("modalCapacity").textContent = pill.dataset.capacity;
