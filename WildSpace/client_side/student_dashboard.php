@@ -85,8 +85,8 @@ if (isset($_POST['create_reservation'])) {
                 INNER JOIN tbluser student_user ON s.user_id = student_user.user_id
                 WHERE r.reservation_date BETWEEN $1 AND $2
                 AND (
-                    r.student_id = $3
-                    OR r.status = 'Approved'
+                    r.status = 'Approved'
+                    OR (r.student_id = $3 AND r.status = 'Pending')
                 )
                 ORDER BY r.reservation_date ASC";
 
@@ -170,9 +170,36 @@ if (isset($_POST['create_reservation'])) {
 
     $view = $_GET['view'] ?? 'reservations';
 
-    if (!in_array($view, ['reservations', 'book'])) {
-        $view = 'reservations';
-    }
+    if (!in_array($view, ['reservations', 'book', 'violations'])) {
+    $view = 'reservations';
+}
+    $violationsSql = "SELECT
+                    v.violation_id,
+                    v.violation_type,
+                    v.description,
+                    v.violation_date,
+                    r.reservation_date,
+                    r.capacity,
+                    u.firstname AS admin_firstname,
+                    u.lastname AS admin_lastname
+                  FROM tblviolation v
+                  INNER JOIN tblreservation r ON v.reservation_id = r.reservation_id
+                  LEFT JOIN tbladmin a ON v.admin_id = a.admin_id
+                  LEFT JOIN tbluser u ON a.user_id = u.user_id
+                  WHERE v.student_id = $1
+                  ORDER BY v.violation_date DESC";
+
+$violationsResult = pg_query_params($conn, $violationsSql, [$student_id]);
+
+if (!$violationsResult) {
+    die("Violations query failed: " . pg_last_error($conn));
+}
+
+$violations = [];
+
+while ($row = pg_fetch_assoc($violationsResult)) {
+    $violations[] = $row;
+}
 
     $firstDayOfMonth = date('N', strtotime($monthStart));
     $daysInMonth = date('t', strtotime($monthStart));
@@ -401,8 +428,53 @@ if (isset($_POST['create_reservation'])) {
 .calendar-reservation.other-approved:hover {
     transform: none;
     opacity: 0.75;
+    .violations-table {
+    table-layout: fixed;
+    width: 100%;
 }
 
+}
+
+.violations-table th,
+.violations-table td {
+    font-size: 13px;
+    line-height: 1.45;
+    padding: 20px 18px;
+    vertical-align: middle;
+}
+
+.violations-table th {
+    font-size: 14px;
+    letter-spacing: 0.08em;
+}
+
+.violations-table .col-id {
+    width: 9%;
+}
+
+.violations-table .col-date {
+    width: 14%;
+}
+
+.violations-table .col-seats {
+    width: 9%;
+}
+
+.violations-table .col-type {
+    width: 13%;
+}
+
+.violations-table .col-description {
+    width: 27%;
+}
+
+.violations-table .col-admin {
+    width: 13%;
+}
+
+.violations-table .col-marked {
+    width: 15%;
+}
         </style>
     </head>
 
@@ -428,6 +500,12 @@ if (isset($_POST['create_reservation'])) {
                     <i class="fas fa-plus-circle"></i>
                     Book Study Space
                 </a>
+
+                <a href="student_dashboard.php?view=violations"
+   class="sidebar-link <?php echo $view === 'violations' ? 'active' : ''; ?>">
+    <i class="fas fa-triangle-exclamation"></i>
+    My Violations
+</a>
             </nav>
 
             <div class="sidebar-footer">
@@ -656,9 +734,78 @@ if (isset($_POST['create_reservation'])) {
 
             <?php } ?>
 
+            <?php if ($view === 'violations') { ?>
+
+                <section class="admin-panel active">
+                    <header class="dashboard-header">
+                        <div class="dashboard-title">
+                            <h1>My Violations</h1>
+                            <p>View violations marked by administrators.</p>
+                        </div>
+                    </header>
+
+                    <section class="table-card">
+                        <div class="table-header">
+                            <h2>Violation History</h2>
+                            <p>Records of no-show violations from approved reservations</p>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="violations-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-id">Violation ID</th>
+                                        <th class="col-date">Reservation Date</th>
+                                        <th class="col-seats">Seats</th>
+                                        <th class="col-type">Violation Type</th>
+                                        <th class="col-description">Description</th>
+                                        <th class="col-admin">Marked By</th>
+                                        <th class="col-marked">Date Marked</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <?php if (count($violations) === 0) { ?>
+                                        <tr>
+                                            <td colspan="7" class="muted">You have no violations.</td>
+                                        </tr>
+                                    <?php } ?>
+
+                                    <?php foreach ($violations as $violation) { ?>
+                                        <tr>
+                                            <td>#<?php echo htmlspecialchars($violation['violation_id']); ?></td>
+                                            <td><?php echo htmlspecialchars(formatReadableDate($violation['reservation_date'])); ?></td>
+                                            <td><?php echo htmlspecialchars($violation['capacity']); ?> seats</td>
+                                            <td><?php echo htmlspecialchars($violation['violation_type']); ?></td>
+                                            <td><?php echo htmlspecialchars($violation['description']); ?></td>
+                                            <td>
+                                                <?php
+                                                    if (!empty($violation['admin_firstname'])) {
+                                                        echo htmlspecialchars(trim($violation['admin_firstname'] . ' ' . $violation['admin_lastname']));
+                                                    } else {
+                                                        echo "Unknown admin";
+                                                    }
+                                                ?>
+                                            </td>
+                                            <td>
+    <?php
+        $violationDate = new DateTime($violation['violation_date'], new DateTimeZone('UTC'));
+        $violationDate->setTimezone(new DateTimeZone('Asia/Manila'));
+        echo htmlspecialchars($violationDate->format("F d, Y"));
+    ?>
+</td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </section>
+
+            <?php } ?>
+
         </main>
     </div>
-
 
     <div class="modal-overlay" id="reservationModal">
         <div class="modal-card">
