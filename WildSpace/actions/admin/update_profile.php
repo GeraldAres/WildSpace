@@ -2,64 +2,48 @@
 session_start();
 include '../../database/connection.php';
 
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin_id'])) {
-    header("Location: ../../client_side/login.php");
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
+    header("Location: ../client_side/login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+$role = $_SESSION['role'];
+
+if ($role === 'admin') {
+    $dashboard = "../../client_side/admin_reservations.php";
+} elseif ($role === 'student') {
+    $dashboard = "../../client_side/student_dashboard.php";
+} else {
+    $_SESSION['profile_error'] = "Invalid account role.";
+    header("Location: ../client_side/edit_profile.php");
     exit();
 }
 
 if (!isset($_POST['update_profile'])) {
-    header("Location: ../../client_side/edit_profile.php");
+    header("Location: " . $dashboard);
     exit();
 }
-
-$admin_id = $_SESSION['admin_id'];
 
 $firstname = trim($_POST['firstname'] ?? '');
 $lastname = trim($_POST['lastname'] ?? '');
 $mobile_number = trim($_POST['mobile_number'] ?? '');
 $gender = trim($_POST['gender'] ?? '');
 
-/*
-    Email is intentionally NOT included here.
-    Even if the email is sent from the form, this backend will not update it.
-*/
-
 if (!empty($mobile_number) && !preg_match('/^[0-9]{11}$/', $mobile_number)) {
-    echo "Mobile number must contain exactly 11 digits.";
+    $_SESSION['profile_error'] = "Mobile number must contain exactly 11 digits.";
+    header("Location: ../client_side/edit_profile.php");
     exit();
 }
 
 $allowed_genders = ['', 'Male', 'Female', 'Prefer not to say'];
 
 if (!in_array($gender, $allowed_genders)) {
-    echo "Invalid gender selected.";
+    $_SESSION['profile_error'] = "Invalid gender selected.";
+    header("Location: ../client_side/edit_profile.php");
     exit();
 }
 
-/*
-    Get the user_id connected to the logged-in admin_id.
-    This makes sure the update applies only to the current admin account.
-*/
-$findAdmin = "SELECT user_id FROM tbladmin WHERE admin_id = $1";
-$adminResult = pg_query_params($conn, $findAdmin, [$admin_id]);
-
-if (!$adminResult) {
-    echo "Database error: " . pg_last_error($conn);
-    exit();
-}
-
-if (pg_num_rows($adminResult) == 0) {
-    echo "Admin account not found.";
-    exit();
-}
-
-$admin = pg_fetch_assoc($adminResult);
-$user_id = $admin['user_id'];
-
-/*
-    Update only the editable profile fields in tbluser.
-    Email and password are not updated here.
-*/
 $sql = "UPDATE tbluser
         SET firstname = $1,
             lastname = $2,
@@ -76,10 +60,11 @@ $result = pg_query_params($conn, $sql, [
 ]);
 
 if ($result) {
-    header("Location: ../../client_side/admin_reservations.php");
-    exit();
-} else {
-    echo "Failed to update profile: " . pg_last_error($conn);
+    header("Location: " . $dashboard);
     exit();
 }
+
+$_SESSION['profile_error'] = "Failed to update profile: " . pg_last_error($conn);
+header("Location: ../client_side/edit_profile.php");
+exit();
 ?>
