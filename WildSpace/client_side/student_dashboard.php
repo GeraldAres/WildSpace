@@ -216,8 +216,8 @@ while ($row = pg_fetch_assoc($violationsResult)) {
 
         <style>
             .calendar-wrapper {
-                background: #fff;
-                border: 1px solid #e5e5e5;
+                background: rgba(255,255,255,0.04);
+                border: 1px solid rgba(255,255,255,0.1);
                 border-radius: 24px;
                 padding: 24px;
                 margin-bottom: 30px;
@@ -232,16 +232,22 @@ while ($row = pg_fetch_assoc($violationsResult)) {
 
             .calendar-header h2 {
                 font-size: 28px;
+                color: #eef2ff;
             }
 
             .calendar-nav a {
                 text-decoration: none;
-                background: #000;
-                color: #fff;
+                background: linear-gradient(135deg, rgba(250,204,21,1), rgba(253,186,116,0.95));
+                color: #08101f;
                 padding: 10px 18px;
                 border-radius: 999px;
                 font-weight: 700;
                 margin-left: 8px;
+                transition: transform 0.2s ease;
+            }
+
+            .calendar-nav a:hover {
+                transform: translateY(-1px);
             }
 
             .calendar-grid {
@@ -254,20 +260,21 @@ while ($row = pg_fetch_assoc($violationsResult)) {
                 font-weight: 800;
                 text-align: center;
                 padding: 12px;
-                color: #666;
+                color: #a5b4fc;
             }
 
             .calendar-day {
                 min-height: 130px;
-                border: 1px solid #e5e5e5;
+                border: 1px solid rgba(255,255,255,0.1);
                 border-radius: 18px;
                 padding: 12px;
-                background: #fafafa;
+                background: rgba(255,255,255,0.02);
             }
 
             .calendar-date {
                 font-weight: 800;
                 margin-bottom: 8px;
+                color: #eef2ff;
             }
 
             .calendar-reservation {
@@ -284,18 +291,24 @@ while ($row = pg_fetch_assoc($violationsResult)) {
         cursor: pointer;
         text-align: left;
         font-family: inherit;
+        transition: all 0.2s ease;
     }
 
     .calendar-reservation:hover {
         transform: translateY(-1px);
         opacity: 0.9;
     }
+
             .reservation-form-card {
-                background: #fff;
-                border: 1px solid #e5e5e5;
+                background: rgba(255,255,255,0.04);
+                border: 1px solid rgba(255,255,255,0.1);
                 border-radius: 24px;
                 padding: 24px;
                 margin-bottom: 30px;
+            }
+
+            .reservation-form-card h2 {
+                color: #eef2ff;
             }
 
             .reservation-form {
@@ -309,24 +322,39 @@ while ($row = pg_fetch_assoc($violationsResult)) {
                 display: block;
                 font-weight: 700;
                 margin-bottom: 8px;
+                color: #eef2ff;
             }
 
             .form-input {
                 width: 100%;
                 padding: 14px 16px;
-                border: 1px solid #ddd;
+                border: 1px solid rgba(255,255,255,0.12);
                 border-radius: 14px;
                 font-size: 15px;
+                background: rgba(255,255,255,0.05);
+                color: #eef2ff;
+                transition: border-color 0.2s ease;
+            }
+
+            .form-input:focus {
+                outline: none;
+                border-color: rgba(250,204,21,0.65);
+                background: rgba(255,255,255,0.09);
             }
 
             .submit-btn {
-                background: #000;
-                color: #fff;
+                background: linear-gradient(135deg, rgba(250,204,21,1), rgba(253,186,116,0.95));
+                color: #08101f;
                 border: none;
                 padding: 15px 24px;
                 border-radius: 999px;
                 font-weight: 800;
                 cursor: pointer;
+                transition: transform 0.2s ease;
+            }
+
+            .submit-btn:hover {
+                transform: translateY(-1px);
             }
 
             .message {
@@ -337,13 +365,15 @@ while ($row = pg_fetch_assoc($violationsResult)) {
             }
 
             .message.success {
-                background: #e8f7ee;
-                color: #0f8a3b;
+                background: rgba(61, 139, 90, 0.2);
+                color: #6fcf97;
+                border: 1px solid rgba(111, 207, 151, 0.3);
             }
 
             .message.error {
-                background: #fdecec;
-                color: #b42318;
+                background: rgba(255, 99, 99, 0.2);
+                color: #ff9999;
+                border: 1px solid rgba(255, 153, 153, 0.3);
             }
 
             @media (max-width: 900px) {
@@ -358,29 +388,33 @@ while ($row = pg_fetch_assoc($violationsResult)) {
 
             .status-pending,
 .calendar-reservation.status-pending {
-    background: #fff4d8;
-    color: #9a650f;
+    background: rgba(255, 217, 102, 0.2);
+    color: #ffd966;
+    border: 1px solid rgba(255, 217, 102, 0.4);
 }
             .status-approved,
             .calendar-reservation.status-approved {
-                background: #e8f7ee;
-                color: #0f8a3b;
+                background: rgba(61, 139, 90, 0.2);
+                color: #6fcf97;
+                border: 1px solid rgba(111, 207, 151, 0.4);
             }
 
             .status-rejected,
             .calendar-reservation.status-rejected {
-                background: #fdecec;
-                color: #b42318;
+                background: rgba(255, 99, 99, 0.2);
+                color: #ff9999;
+                border: 1px solid rgba(255, 153, 153, 0.4);
             }
 
             .modal-overlay {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.45);
+        background: rgba(0,0,0,0.65);
         z-index: 9999;
         align-items: center;
         justify-content: center;
+        backdrop-filter: blur(4px);
     }
 
     .modal-overlay.active {
@@ -388,50 +422,60 @@ while ($row = pg_fetch_assoc($violationsResult)) {
     }
 
     .modal-card {
-        background: #fff;
+        background: rgba(13, 23, 44, 0.95);
+        border: 1px solid rgba(255,255,255,0.1);
         width: 90%;
         max-width: 420px;
         border-radius: 24px;
         padding: 36px 32px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         text-align: center;
     }
 
     .modal-card h2 {
         margin-bottom: 24px;
+        color: #eef2ff;
     }
 
     .modal-card p {
         margin-bottom: 14px;
         text-align: center;
+        color: #a5b4fc;
     }
 
     .modal-close {
         margin: 24px auto 0;
         display: block;
-        background: #000;
-        color: #fff;
+        background: linear-gradient(135deg, rgba(250,204,21,1), rgba(253,186,116,0.95));
+        color: #08101f;
         border: none;
         padding: 12px 28px;
         border-radius: 999px;
         cursor: pointer;
         font-weight: 700;
+        transition: transform 0.2s ease;
     }
+
+    .modal-close:hover {
+        transform: translateY(-1px);
+    }
+
     .calendar-reservation.other-approved {
-    background: #e8f7ee;
-    color: #0f8a3b;
+    background: rgba(61, 139, 90, 0.2);
+    color: #6fcf97;
     cursor: not-allowed;
     opacity: 0.75;
+    border: 1px solid rgba(111, 207, 151, 0.3);
 }
 
 .calendar-reservation.other-approved:hover {
     transform: none;
     opacity: 0.75;
-    .violations-table {
-    table-layout: fixed;
-    width: 100%;
 }
 
+.violations-table {
+    table-layout: fixed;
+    width: 100%;
 }
 
 .violations-table th,
@@ -483,23 +527,29 @@ while ($row = pg_fetch_assoc($violationsResult)) {
     text-decoration: none;
     border: none;
     cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
 .delete-btn {
-    background: #000;
-    color: #fff;
+    background: linear-gradient(135deg, rgba(250,204,21,1), rgba(253,186,116,0.95));
+    color: #08101f;
 }
 
 .approve-btn {
-    background: #e8f7ee;
-    color: #0f8a3b;
+    background: rgba(61, 139, 90, 0.2);
+    color: #6fcf97;
 }
 
 .reject-btn {
-    background: #fdecec;
-    color: #a32618;
+    background: rgba(255, 99, 99, 0.2);
+    color: #ff9999;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
 }
         </style>
+
     </head>
 
 
