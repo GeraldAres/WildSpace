@@ -101,7 +101,6 @@
 
             </div>
 
-            <form class="auth-form" id="registerForm" action="../actions/register_action.php" method="POST" novalidate>
                 <div class="form-group">
                     <input type="text" name="firstname" class="form-input" placeholder="First Name:" required>
                 </div>
@@ -171,7 +170,9 @@
                     <div id="registerMessage" class="auth-message" role="alert" aria-live="polite" hidden></div>
                 </div>
 
-                <button type="button" id="registerSubmit" class="auth-submit-button">Create Account</button>
+                    <button type="submit" name="register" id="registerSubmit" class="auth-submit-button">
+        Create Account
+    </button>
             </form>
 
         <!-- ================= FOOTER ================= -->

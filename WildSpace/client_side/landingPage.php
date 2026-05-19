@@ -59,7 +59,7 @@
     <section class="section3">
         <div class="section3-content">
             <div class="section3-title">
-                <img src="../assets/images/wildspace_logo.png" alt="WildSpace Logo" class="footer-logo-img">
+                 <h1 class="logo-text">WildSpace</h1>
             </div>
             <p class="section3-description">
                 A centralized platform for CIT-U students to check availability, reserve tables, and manage study spaces in real time—so you spend less time searching and more time learning.
@@ -122,7 +122,7 @@
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-logo">
-                <img src="../assets/images/wildspace_logo.png" alt="WildSpace Logo" class="footer-logo-img">
+                 <h1 class="logo-text">WildSpace</h1>
                 <p>Study without the hassle</p>
             </div>
             <div class="footer-content">

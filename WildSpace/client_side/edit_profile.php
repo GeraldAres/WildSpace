@@ -2,37 +2,60 @@
 session_start();
 include '../database/connection.php';
 
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin_id'])) {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
     header("Location: login.php");
     exit();
 }
 
-$admin_id = $_SESSION['admin_id'];
+$user_id = $_SESSION['user_id'];
+$role = $_SESSION['role'];
+
+if ($role === 'admin') {
+    $role_id = $_SESSION['admin_id'] ?? null;
+    $dashboard = "admin_reservations.php";
+    $roleLabel = "Admin";
+} elseif ($role === 'student') {
+    $role_id = $_SESSION['student_id'] ?? null;
+    $dashboard = "student_dashboard.php";
+    $roleLabel = "Student";
+} else {
+    header("Location: login.php");
+    exit();
+}
+
+if (!$role_id) {
+    header("Location: login.php");
+    exit();
+}
 
 $sql = "SELECT 
-            a.admin_id,
-            a.user_id,
-            u.firstname,
-            u.lastname,
-            u.email,
-            u.mobile_number,
-            u.gender
-        FROM tbladmin a
-        INNER JOIN tbluser u ON a.user_id = u.user_id
-        WHERE a.admin_id = $1";
+            user_id,
+            firstname,
+            lastname,
+            email,
+            mobile_number,
+            gender
+        FROM tbluser
+        WHERE user_id = $1";
 
-$result = pg_query_params($conn, $sql, [$admin_id]);
+$result = pg_query_params($conn, $sql, [$user_id]);
 
 if (!$result) {
     die("Query failed: " . pg_last_error($conn));
 }
 
 if (pg_num_rows($result) == 0) {
-    echo "Admin profile not found.";
+    echo "Profile not found.";
     exit();
 }
 
-$admin = pg_fetch_assoc($result);
+$user = pg_fetch_assoc($result);
+
+$success = $_SESSION['profile_success'] ?? '';
+$error = $_SESSION['profile_error'] ?? '';
+
+unset($_SESSION['profile_success']);
+unset($_SESSION['profile_error']);
 ?>
 
 <!DOCTYPE html>
@@ -42,12 +65,25 @@ $admin = pg_fetch_assoc($result);
     <title>WildSpace - Edit Profile</title>
 
     <style>
+        .delete-account-btn {
+    background: #b42318;
+    color: #fff;
+    border: none;
+    padding: 13px 28px;
+    border-radius: 999px;
+    font-weight: 700;
+    cursor: pointer;
+}
         :root {
             --black: #000000;
             --white: #ffffff;
             --gray: #f5f5f5;
             --text-gray: #666666;
             --border: #e5e5e5;
+            --green-bg: #e8f7ee;
+            --green: #0f8a3b;
+            --red-bg: #fdecec;
+            --red: #b42318;
         }
 
         * {
@@ -143,7 +179,6 @@ $admin = pg_fetch_assoc($result);
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
-
             background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 18px center;
@@ -196,6 +231,23 @@ $admin = pg_fetch_assoc($result);
             font-size: 14px;
         }
 
+        .message {
+            padding: 14px 18px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .success {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .error {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
         @media (max-width: 700px) {
             .navbar {
                 padding: 20px;
@@ -218,24 +270,46 @@ $admin = pg_fetch_assoc($result);
                 padding: 24px;
             }
         }
+
+        .profile-actions,
+.delete-action-row {
+    display: flex;
+    align-items: center;
+}
+
+.left-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.delete-action-row {
+    justify-content: flex-end;
+    margin-top: -43px;
+}
     </style>
 </head>
 <body>
 
 <nav class="navbar">
-    <a href="admin_reservations.php" class="nav-link">Back to Dashboard</a>
+    <a href="<?php echo htmlspecialchars($dashboard); ?>" class="nav-link">Back to Dashboard</a>
     <div class="logo-text">WildSpace</div>
     <div></div>
 </nav>
 
 <main class="page-wrapper">
     <h1>Edit Profile</h1>
-    <p class="subtitle">Update your admin account information. Changes will be saved directly to the database.</p>
+    <p class="subtitle">Update your <?php echo strtolower($roleLabel); ?> account information.</p>
+
+
+
+    <?php if (!empty($error)) { ?>
+        <div class="message error"><?php echo htmlspecialchars($error); ?></div>
+    <?php } ?>
 
     <div class="form-card">
         <div class="account-info">
-            Admin ID: <?php echo htmlspecialchars($admin['admin_id']); ?> |
-            User ID: <?php echo htmlspecialchars($admin['user_id']); ?>
+            <?php echo htmlspecialchars($roleLabel); ?> ID: <?php echo htmlspecialchars($role_id); ?> |
+            User ID: <?php echo htmlspecialchars($user['user_id']); ?>
         </div>
 
         <form action="../actions/admin/update_profile.php" method="POST">
@@ -245,7 +319,7 @@ $admin = pg_fetch_assoc($result);
                     <input 
                         type="text" 
                         name="firstname" 
-                        value="<?php echo htmlspecialchars($admin['firstname'] ?? ''); ?>"
+                        value="<?php echo htmlspecialchars($user['firstname'] ?? ''); ?>"
                     >
                 </div>
 
@@ -254,7 +328,7 @@ $admin = pg_fetch_assoc($result);
                     <input 
                         type="text" 
                         name="lastname" 
-                        value="<?php echo htmlspecialchars($admin['lastname'] ?? ''); ?>"
+                        value="<?php echo htmlspecialchars($user['lastname'] ?? ''); ?>"
                     >
                 </div>
             </div>
@@ -263,15 +337,9 @@ $admin = pg_fetch_assoc($result);
                 <label>Email Address</label>
                 <input 
                     type="email" 
-                    value="<?php echo htmlspecialchars($admin['email']); ?>"
+                    value="<?php echo htmlspecialchars($user['email']); ?>"
                     disabled
                     class="readonly-input"
-                >
-
-                <input 
-                    type="hidden" 
-                    name="email" 
-                    value="<?php echo htmlspecialchars($admin['email']); ?>"
                 >
             </div>
 
@@ -281,7 +349,7 @@ $admin = pg_fetch_assoc($result);
                     type="text" 
                     name="mobile_number" 
                     maxlength="11"
-                    value="<?php echo htmlspecialchars($admin['mobile_number'] ?? ''); ?>"
+                    value="<?php echo htmlspecialchars($user['mobile_number'] ?? ''); ?>"
                 >
             </div>
 
@@ -289,17 +357,33 @@ $admin = pg_fetch_assoc($result);
                 <label>Gender</label>
                 <select name="gender">
                     <option value="">Select gender</option>
-                    <option value="Male" <?php if (($admin['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
-                    <option value="Female" <?php if (($admin['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
-                    <option value="Prefer not to say" <?php if (($admin['gender'] ?? '') == 'Prefer not to say') echo 'selected'; ?>>Prefer not to say</option>
+                    <option value="Male" <?php if (($user['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
+                    <option value="Female" <?php if (($user['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
+                    <option value="Prefer not to say" <?php if (($user['gender'] ?? '') == 'Prefer not to say') echo 'selected'; ?>>Prefer not to say</option>
                 </select>
             </div>
 
-            <div class="button-row">
-                <button type="submit" name="update_profile" class="save-btn">Save Changes</button>
-                <a href="admin_reservations.php" class="cancel-btn">Cancel</a>
-            </div>
-        </form>
+<div class="button-row profile-actions">
+    <div class="left-actions">
+        <button type="submit" name="update_profile" class="save-btn">Save Changes</button>
+        <a href="<?php echo htmlspecialchars($dashboard); ?>" class="cancel-btn">Cancel</a>
+    </div>
+</div>
+</form>
+
+<?php if ($role === 'student') { ?>
+    <form action="../actions/student/delete_account.php"
+          method="POST"
+          onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+
+        <div class="delete-action-row">
+            <button type="submit" name="delete_account" class="delete-account-btn">
+                Delete Account
+            </button>
+        </div>
+    </form>
+<?php } ?>
+
     </div>
 </main>
 
