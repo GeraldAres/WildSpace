@@ -53,10 +53,12 @@ $requestsSql = "SELECT
         u.firstname,
         u.lastname,
         u.email,
-        u.mobile_number
+        u.mobile_number,
+        v.violation_id
     FROM tblreservation r
     INNER JOIN tblstudent s ON r.student_id = s.student_id
     INNER JOIN tbluser u ON s.user_id = u.user_id
+    LEFT JOIN tblviolation v ON r.reservation_id = v.reservation_id
     ORDER BY r.date_created DESC";
 
 $requestsResult = pg_query($conn, $requestsSql);
@@ -330,7 +332,7 @@ function reservationStatusClass(string $status): string
                                             <?php } else { ?>
                                                 <span class="empty-action">Reviewed</span>
                                             <?php } ?>
-                                            <?php if ($row['status'] === 'Approved') { ?>
+                                            <?php if ($row['status'] === 'Approved' && empty($row['violation_id'])) { ?>
                                                 <a class="action-btn reject-btn"
                                                 href="../actions/admin/add_violation.php?id=<?php echo urlencode($row['reservation_id']); ?>"
                                                 onclick="return confirm('Mark this student as no-show and add a violation?');">
