@@ -206,3 +206,14 @@ document.head.appendChild(style);
 // ============ CONSOLE MESSAGE ============
 console.log('%cWildSpace', 'font-size: 20px; font-weight: bold; color: #000;');
 console.log('%cStudy without the hassle of finding a space.', 'font-size: 14px; color: #555;');
+
+// scroll reveal animation
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add("show");
+        }
+    });
+});
+
+document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));

@@ -24,7 +24,7 @@
     </nav>
 
     <!-- Background Image -->
-    <img src="../assets/images/bg_login.jpg" alt="Background" class="background-image">
+    <!-- <img src="../assets/images/bg_login.jpg" alt="Background" class="background-image"> -->
 
     <main class="auth-wrapper">
         <div class="contact-card" id="contactCard">
@@ -67,6 +67,20 @@
             </div>
         </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                 <h1 class="logo-text">WildSpace</h1>
+                <p>Study without the hassle</p>
+            </div>
+            <div class="footer-content">
+                <p class="footer-contact">Contact: +63 XXX XXX XXXX</p>
+                <p class="footer-copyright">&copy; 2024 WildSpace. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <script src="../assets/js/contact.js"></script>
 </body>
