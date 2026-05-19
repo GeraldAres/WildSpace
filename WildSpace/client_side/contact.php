@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="../assets/css/contact.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">

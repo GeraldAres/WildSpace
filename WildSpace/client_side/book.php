@@ -8,27 +8,21 @@
 </head>
 <body>
 
-   <!-- Navigation Bar -->
-    <nav class="navbar">
+   <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
                 <a href="index.php" class="nav-link">Home</a>
                 <a href="landingPage.php" class="nav-link">About Us</a>
             </div>
-            
             <div class="logo">
-                  <img src="../assets/images/wildspace_logo.png" alt="WildSpace Logo" class="footer-logo-img">
+                <h1 class="logo-text">WildSpace</h1>
             </div>
-            
             <div class="nav-right">
                 <a href="book.php" class="nav-link">Reservation</a>
                 <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
             </div>
         </div>
     </nav>
-
-    <!-- Background Image (Optional, for consistency) -->
-    <img src="../assets/images/bg_login.jpg" alt="Background" class="background-image">
 
     <!-- MAIN BOOKING SECTION -->
 <main class="booking-wrapper">

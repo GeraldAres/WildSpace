@@ -7,20 +7,15 @@
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
                 <a href="index.php" class="nav-link">Home</a>
                 <a href="landingPage.php" class="nav-link">About Us</a>
             </div>
-            
             <div class="logo">
-                <div class="footer-logo">
-                <img src="../assets/images/wildspace_logo.png" alt="WildSpace Logo" class="footer-logo-img">
-                </div>
+                <h1 class="logo-text">WildSpace</h1>
             </div>
-            
             <div class="nav-right">
                 <a href="book.php" class="nav-link">Reservation</a>
                 <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>

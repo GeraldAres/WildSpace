@@ -7,20 +7,15 @@
     <link rel="stylesheet" href="../assets/css/index.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
                 <a href="index.php" class="nav-link">Home</a>
                 <a href="landingPage.php" class="nav-link">About Us</a>
             </div>
-            
             <div class="logo">
-                <div class="footer-logo">
-                <img src="../assets/images/wildspace_logo.png" alt="WildSpace Logo" class="footer-logo-img">
-                </div>
+                <h1 class="logo-text">WildSpace</h1>
             </div>
-            
             <div class="nav-right">
                 <a href="book.php" class="nav-link">Reservation</a>
                 <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
@@ -30,18 +25,36 @@
 
   <section class="hero">
         <div class="hero-left">
-            <div class="hero-content">
-                <div class="logo-section">
-                    <img src="../assets/images/wildspace_logo.png" alt="WildSpace Logo" class="hero-logo-img">
+            <div class="hero-copy">
+                <span class="eyebrow">Studio-grade booking for campus life</span>
+                <h1 class="hero-title">Book smarter study spaces with a premium edge.</h1>
+                <p class="hero-copytext">WildSpace gives CIT-U students fast access to the best study spots, group rooms, and workspace support—all from one polished dashboard.</p>
+                <div class="hero-actions">
+                    <button onclick="location.href='login.php'" class="cta-button cta-primary">Get Started</button>
+                    <a href="landingPage.php" class="secondary-link">See the platform</a>
                 </div>
-                <button onclick="location.href='login.php'" class="cta-button cta-primary">Get Started ></button>
             </div>
         </div>
 
         <div class="hero-right">
             <div class="image-container">
-                <img src="../assets/images/person5.png"  alt="Professional with briefcase" class="hero-image">
+                <img src="../assets/images/person5.png" alt="Professional with briefcase" class="hero-image">
             </div>
+        </div>
+    </section>
+
+    <section class="feature-strip">
+        <div class="feature-card">
+            <strong>Fast reservations</strong>
+            <span>Reserve spaces in seconds with instant confirmation.</span>
+        </div>
+        <div class="feature-card">
+            <strong>Premium study hubs</strong>
+            <span>Choose the best locations and table setups for your session.</span>
+        </div>
+        <div class="feature-card">
+            <strong>Collaborate easily</strong>
+            <span>Invite classmates and reserve group-ready seating.</span>
         </div>
     </section>
 
