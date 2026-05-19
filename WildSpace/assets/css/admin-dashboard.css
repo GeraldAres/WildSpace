@@ -1,16 +1,24 @@
 :root {
+    --surface: #060b16;
+    --surface-soft: #0d172c;
+    --text-main: #eef2ff;
+    --text-muted: #a5b4fc;
+    --accent: #facc15;
+    --accent-strong: #f59e0b;
+    --border: rgba(255,255,255,0.08);
+    --shadow: 0 32px 80px rgba(0,0,0,0.28);
+    --radius: 28px;
     --black: #000000;
     --dark: #1f1f1f;
     --white: #ffffff;
-    --gray: #f5f5f5;
-    --text-gray: #666666;
-    --border: #e5e5e5;
-    --approved: #0f8a3b;
-    --approved-bg: #e8f7ee;
-    --rejected: #b42318;
-    --rejected-bg: #fdecec;
-    --pending: #9a6700;
-    --pending-bg: #fff4d6;
+    --gray: #0d172c;
+    --text-gray: #9ca3af;
+    --approved: #6fcf97;
+    --approved-bg: rgba(61, 139, 90, 0.15);
+    --rejected: #ff9999;
+    --rejected-bg: rgba(255, 99, 99, 0.15);
+    --pending: #ffd966;
+    --pending-bg: rgba(255, 217, 102, 0.15);
     --sidebar-width: 260px;
 }
 
@@ -22,8 +30,9 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: var(--gray);
-    color: var(--black);
+    background: radial-gradient(circle at top left, rgba(250,204,21,0.14), transparent 16%),
+                linear-gradient(180deg, #08101f 0%, #0d172c 100%);
+    color: var(--text-main);
     min-height: 100vh;
 }
 
@@ -35,7 +44,9 @@ body {
 .admin-sidebar {
     width: var(--sidebar-width);
     flex-shrink: 0;
-    background: var(--black);
+    background: rgba(7, 12, 25, 0.95);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid rgba(255,255,255,0.06);
     color: var(--white);
     display: flex;
     flex-direction: column;
@@ -49,7 +60,7 @@ body {
     text-align: center;
     margin-bottom: 36px;
     padding-bottom: 28px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-brand .logo-text {
@@ -57,11 +68,12 @@ body {
     font-weight: 800;
     letter-spacing: -0.5px;
     margin-bottom: 6px;
+    color: var(--text-main);
 }
 
 .sidebar-brand p {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
@@ -79,7 +91,7 @@ body {
     gap: 12px;
     padding: 12px 14px;
     border-radius: 12px;
-    color: rgba(255, 255, 255, 0.75);
+    color: var(--text-muted);
     text-decoration: none;
     font-size: 14px;
     font-weight: 600;
@@ -94,26 +106,26 @@ body {
 
 .sidebar-link:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: var(--white);
+    color: var(--text-main);
 }
 
 .sidebar-link.active {
-    background: var(--white);
-    color: var(--black);
+    background: rgba(250,204,21,0.2);
+    color: var(--accent);
 }
 
 .sidebar-footer {
     margin-top: auto;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
 .sidebar-link.logout-link:hover {
-    background: rgba(180, 35, 24, 0.25);
-    color: #ffb4ae;
+    background: rgba(255, 99, 99, 0.2);
+    color: #ff9999;
 }
 
 .admin-main {
@@ -135,17 +147,18 @@ body {
     line-height: 1.1;
     letter-spacing: -1px;
     margin-bottom: 8px;
+    color: var(--text-main);
 }
 
 .dashboard-title p {
-    color: var(--text-gray);
+    color: var(--text-muted);
     font-size: 15px;
     max-width: 560px;
 }
 
 .create-btn {
-    background: var(--black);
-    color: var(--white);
+    background: linear-gradient(135deg, rgba(250,204,21,1), rgba(253,186,116,0.95));
+    color: #08101f;
     text-decoration: none;
     padding: 12px 22px;
     border-radius: 30px;
@@ -153,11 +166,12 @@ body {
     font-size: 14px;
     white-space: nowrap;
     transition: 0.2s ease;
+    box-shadow: 0 12px 24px rgba(250,204,21,0.2);
 }
 
 .create-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 16px 32px rgba(250,204,21,0.28);
 }
 
 .summary-cards {
@@ -172,8 +186,8 @@ body {
 }
 
 .summary-card {
-    background: var(--white);
-    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 18px;
     padding: 20px;
 }
@@ -181,36 +195,39 @@ body {
 .summary-card span {
     display: block;
     font-size: 13px;
-    color: var(--text-gray);
+    color: var(--text-muted);
     margin-bottom: 6px;
 }
 
 .summary-card strong {
     font-size: 26px;
     letter-spacing: -0.5px;
+    color: var(--text-main);
 }
 
 .table-card {
-    background: var(--white);
-    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 22px;
     overflow: hidden;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow);
 }
 
 .table-header {
     padding: 20px 24px;
-    background: var(--black);
-    color: var(--white);
+    background: rgba(0,0,0,0.3);
+    color: var(--text-main);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 .table-header h2 {
     font-size: 20px;
     letter-spacing: -0.3px;
+    color: var(--text-main);
 }
 
 .table-header p {
-    color: #ccc;
+    color: var(--text-muted);
     font-size: 13px;
     margin-top: 4px;
 }
@@ -227,34 +244,36 @@ table {
 }
 
 th {
-    background: #fafafa;
+    background: rgba(255,255,255,0.03);
     text-align: left;
     padding: 16px 18px;
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--text-gray);
-    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 td {
     padding: 18px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
     font-size: 14px;
     vertical-align: middle;
+    color: var(--text-main);
 }
 
 tr:hover {
-    background: #fafafa;
+    background: rgba(255,255,255,0.03);
 }
 
 .email-text,
 .name-text {
     font-weight: 600;
+    color: var(--text-main);
 }
 
 .muted {
-    color: var(--text-gray);
+    color: var(--text-muted);
     font-size: 13px;
 }
 
@@ -282,8 +301,8 @@ tr:hover {
 }
 
 .status-cancelled {
-    background: #eee;
-    color: #555;
+    background: rgba(255,255,255,0.06);
+    color: var(--text-muted);
 }
 
 .actions {
@@ -315,8 +334,9 @@ tr:hover {
 }
 
 .delete-btn {
-    background: var(--black);
-    color: var(--white);
+    background: linear-gradient(135deg, rgba(250,204,21,1), rgba(253,186,116,0.95));
+    color: #08101f;
+    font-weight: 700;
 }
 
 .action-btn:hover {
