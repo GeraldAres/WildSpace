@@ -320,6 +320,13 @@ function reservationStatusClass(string $status): string
                                             <?php } else { ?>
                                                 <span class="empty-action">Reviewed</span>
                                             <?php } ?>
+                                            <?php if ($row['status'] === 'Approved') { ?>
+                                                <a class="action-btn reject-btn"
+                                                href="../actions/admin/add_violation.php?id=<?php echo urlencode($row['reservation_id']); ?>"
+                                                onclick="return confirm('Mark this student as no-show and add a violation?');">
+                                                    No Show
+                                                </a>
+                                            <?php } ?>
 
                                             <a class="action-btn delete-btn"
                                                href="../actions/admin/admin_delete_reservation.php?id=<?php echo urlencode($row['reservation_id']); ?>"
