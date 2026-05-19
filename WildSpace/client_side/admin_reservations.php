@@ -247,7 +247,6 @@ function reservationStatusClass(string $status): string
                     <p>Review booking requests from students. Approve or reject pending reservations.</p>
                 </div>
 
-                <a href="admin_create_reservation.php" class="create-btn">+ Create Reservation</a>
             </header>
 
             <section class="summary-cards">
