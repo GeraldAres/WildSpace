@@ -103,6 +103,36 @@ if (isset($_POST['create_reservation'])) {
     }
 
     /* STUDENT RESERVATIONS */
+    $reservationsPerPage = 10;
+    $reservationPage = isset($_GET['reservation_page']) && is_numeric($_GET['reservation_page']) && (int)$_GET['reservation_page'] > 0
+        ? (int)$_GET['reservation_page']
+        : 1;
+
+    $countSql = "SELECT
+                    COUNT(*) AS total_reservations,
+                    SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) AS pending_reservations,
+                    SUM(CASE WHEN status = 'Approved' THEN 1 ELSE 0 END) AS approved_reservations,
+                    SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) AS rejected_reservations
+                FROM tblreservation
+                WHERE student_id = $1";
+
+    $countResult = pg_query_params($conn, $countSql, [$student_id]);
+
+    if (!$countResult) {
+        die("Count query failed: " . pg_last_error($conn));
+    }
+
+    $countRow = pg_fetch_assoc($countResult);
+
+    $total = (int)($countRow['total_reservations'] ?? 0);
+    $pending = (int)($countRow['pending_reservations'] ?? 0);
+    $approved = (int)($countRow['approved_reservations'] ?? 0);
+    $rejected = (int)($countRow['rejected_reservations'] ?? 0);
+
+    $reservationPageCount = max(1, (int)ceil($total / $reservationsPerPage));
+    $reservationPage = min($reservationPage, $reservationPageCount);
+    $reservationOffset = ($reservationPage - 1) * $reservationsPerPage;
+
     $sql = "SELECT
                 r.reservation_id,
                 r.status,
@@ -115,31 +145,19 @@ if (isset($_POST['create_reservation'])) {
             LEFT JOIN tbladmin a ON r.admin_id = a.admin_id
             LEFT JOIN tbluser u ON a.user_id = u.user_id
             WHERE r.student_id = $1
-            ORDER BY r.date_created DESC";
+            ORDER BY r.date_created DESC
+            LIMIT $2 OFFSET $3";
 
-    $result = pg_query_params($conn, $sql, [$student_id]);
+    $result = pg_query_params($conn, $sql, [$student_id, $reservationsPerPage, $reservationOffset]);
 
     if (!$result) {
         die("Query failed: " . pg_last_error($conn));
     }
 
     $reservations = [];
-    $total = 0;
-    $pending = 0;
-    $approved = 0;
-    $rejected = 0;
 
     while ($row = pg_fetch_assoc($result)) {
         $reservations[] = $row;
-        $total++;
-
-        if ($row['status'] === 'Pending') {
-            $pending++;
-        } elseif ($row['status'] === 'Approved') {
-            $approved++;
-        } elseif ($row['status'] === 'Rejected') {
-            $rejected++;
-        }
     }
     function reservationStatusClass(string $status): string
     {
@@ -172,33 +190,56 @@ if (isset($_POST['create_reservation'])) {
     if (!in_array($view, ['reservations', 'book', 'violations'])) {
     $view = 'reservations';
 }
+    $violationsPerPage = 10;
+    $violationPage = isset($_GET['violation_page']) && is_numeric($_GET['violation_page']) && (int)$_GET['violation_page'] > 0
+        ? (int)$_GET['violation_page']
+        : 1;
+
+    $violationsCountSql = "SELECT COUNT(*) AS total_violations
+                           FROM tblviolation
+                           WHERE student_id = $1";
+
+    $violationsCountResult = pg_query_params($conn, $violationsCountSql, [$student_id]);
+
+    if (!$violationsCountResult) {
+        die("Violations count query failed: " . pg_last_error($conn));
+    }
+
+    $violationsCountRow = pg_fetch_assoc($violationsCountResult);
+    $violationsTotal = (int)($violationsCountRow['total_violations'] ?? 0);
+
+    $violationPageCount = max(1, (int)ceil($violationsTotal / $violationsPerPage));
+    $violationPage = min($violationPage, $violationPageCount);
+    $violationOffset = ($violationPage - 1) * $violationsPerPage;
+
     $violationsSql = "SELECT
-                    v.violation_id,
-                    v.violation_type,
-                    v.description,
-                    v.violation_date,
-                    r.reservation_date,
-                    r.capacity,
-                    u.firstname AS admin_firstname,
-                    u.lastname AS admin_lastname
-                  FROM tblviolation v
-                  INNER JOIN tblreservation r ON v.reservation_id = r.reservation_id
-                  LEFT JOIN tbladmin a ON v.admin_id = a.admin_id
-                  LEFT JOIN tbluser u ON a.user_id = u.user_id
-                  WHERE v.student_id = $1
-                  ORDER BY v.violation_date DESC";
+                        v.violation_id,
+                        v.violation_type,
+                        v.description,
+                        v.violation_date,
+                        r.reservation_date,
+                        r.capacity,
+                        u.firstname AS admin_firstname,
+                        u.lastname AS admin_lastname
+                      FROM tblviolation v
+                      INNER JOIN tblreservation r ON v.reservation_id = r.reservation_id
+                      LEFT JOIN tbladmin a ON v.admin_id = a.admin_id
+                      LEFT JOIN tbluser u ON a.user_id = u.user_id
+                      WHERE v.student_id = $1
+                      ORDER BY v.violation_date DESC
+                      LIMIT $2 OFFSET $3";
 
-$violationsResult = pg_query_params($conn, $violationsSql, [$student_id]);
+    $violationsResult = pg_query_params($conn, $violationsSql, [$student_id, $violationsPerPage, $violationOffset]);
 
-if (!$violationsResult) {
-    die("Violations query failed: " . pg_last_error($conn));
-}
+    if (!$violationsResult) {
+        die("Violations query failed: " . pg_last_error($conn));
+    }
 
-$violations = [];
+    $violations = [];
 
-while ($row = pg_fetch_assoc($violationsResult)) {
-    $violations[] = $row;
-}
+    while ($row = pg_fetch_assoc($violationsResult)) {
+        $violations[] = $row;
+    }
 
     $firstDayOfMonth = date('N', strtotime($monthStart));
     $daysInMonth = date('t', strtotime($monthStart));
@@ -577,7 +618,7 @@ while ($row = pg_fetch_assoc($violationsResult)) {
                 <a href="student_dashboard.php?view=violations"
    class="sidebar-link <?php echo $view === 'violations' ? 'active' : ''; ?>">
     <i class="fas fa-triangle-exclamation"></i>
-    My Violations
+    Violation History
 </a>
             </nav>
 
@@ -697,6 +738,24 @@ while ($row = pg_fetch_assoc($violationsResult)) {
                                 </tbody>
                             </table>
                         </div>
+
+                        <div class="pagination-controls">
+                            <a class="pagination-btn<?php echo $reservationPage <= 1 ? ' disabled' : ''; ?>"
+                               href="student_dashboard.php?view=reservations&reservation_page=<?php echo max(1, $reservationPage - 1); ?>"
+                               <?php if ($reservationPage <= 1) echo 'aria-disabled="true" tabindex="-1"'; ?>>
+                                &laquo; Previous
+                            </a>
+
+                            <span class="pagination-info">
+                                Page <?php echo $reservationPage; ?> of <?php echo $reservationPageCount; ?>
+                            </span>
+
+                            <a class="pagination-btn<?php echo $reservationPage >= $reservationPageCount ? ' disabled' : ''; ?>"
+                               href="student_dashboard.php?view=reservations&reservation_page=<?php echo min($reservationPageCount, $reservationPage + 1); ?>"
+                               <?php if ($reservationPage >= $reservationPageCount) echo 'aria-disabled="true" tabindex="-1"'; ?>>
+                                Next &raquo;
+                            </a>
+                        </div>
                     </section>
                 </section>
 
@@ -812,14 +871,14 @@ while ($row = pg_fetch_assoc($violationsResult)) {
                 <section class="admin-panel active">
                     <header class="dashboard-header">
                         <div class="dashboard-title">
-                            <h1>My Violations</h1>
+                            <h1>Violation History</h1>
                             <p>View violations marked by administrators.</p>
                         </div>
                     </header>
 
                     <section class="table-card">
                         <div class="table-header">
-                            <h2>Violation History</h2>
+                            <h2>No-Shows</h2>
                             <p>Records of no-show violations from approved reservations</p>
                         </div>
 
@@ -871,6 +930,24 @@ while ($row = pg_fetch_assoc($violationsResult)) {
                                     <?php } ?>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <div class="pagination-controls">
+                            <a class="pagination-btn<?php echo $violationPage <= 1 ? ' disabled' : ''; ?>"
+                               href="student_dashboard.php?view=violations&violation_page=<?php echo max(1, $violationPage - 1); ?>"
+                               <?php if ($violationPage <= 1) echo 'aria-disabled="true" tabindex="-1"'; ?>>
+                                &laquo; Previous
+                            </a>
+
+                            <span class="pagination-info">
+                                Page <?php echo $violationPage; ?> of <?php echo $violationPageCount; ?>
+                            </span>
+
+                            <a class="pagination-btn<?php echo $violationPage >= $violationPageCount ? ' disabled' : ''; ?>"
+                               href="student_dashboard.php?view=violations&violation_page=<?php echo min($violationPageCount, $violationPage + 1); ?>"
+                               <?php if ($violationPage >= $violationPageCount) echo 'aria-disabled="true" tabindex="-1"'; ?>>
+                                Next &raquo;
+                            </a>
                         </div>
                     </section>
                 </section>
