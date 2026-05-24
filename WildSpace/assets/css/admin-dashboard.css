@@ -185,6 +185,95 @@ body {
     grid-template-columns: repeat(3, 1fr);
 }
 
+.student-summary-cards {
+    margin-top: 0;
+}
+
+.analytics-card {
+    background: rgba(24, 34, 58, 0.92);
+    border: 1px solid rgba(250,204,21,0.15);
+}
+
+.analytics-content {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 24px;
+    padding: 24px;
+}
+
+.analytics-panel {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 22px;
+}
+
+.analytics-panel h3 {
+    margin-bottom: 16px;
+    font-size: 16px;
+    color: var(--text-main);
+}
+
+.distribution-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 12px;
+}
+
+.distribution-bar-bg {
+    width: 100%;
+    height: 10px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 18px;
+}
+
+.distribution-bar {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.distribution-bar.approved {
+    background: rgba(111, 207, 151, 0.85);
+}
+
+.distribution-bar.pending {
+    background: rgba(255, 217, 102, 0.95);
+}
+
+.distribution-bar.rejected {
+    background: rgba(255, 153, 153, 0.85);
+}
+
+.violations-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 18px;
+}
+
+.violations-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.violations-count {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.violations-label,
+.violations-note {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
 .summary-card {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.1);
