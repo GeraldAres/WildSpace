@@ -12,7 +12,7 @@ $role = $_SESSION['role'];
 
 if ($role === 'admin') {
     $role_id = $_SESSION['admin_id'] ?? null;
-    $dashboard = "admin_reservations.php";
+    $dashboard = "admin_dashboard.php";
     $roleLabel = "Admin";
 } elseif ($role === 'student') {
     $role_id = $_SESSION['student_id'] ?? null;

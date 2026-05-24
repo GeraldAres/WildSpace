@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin_id'])) {
 }
 
 if (!isset($_GET['id']) || !isset($_GET['status'])) {
-    header("Location: ../../client_side/admin_reservations.php?view=requests");
+    header("Location: ../../client_side/admin_dashboard.php?view=requests");
     exit();
 }
 
@@ -19,7 +19,7 @@ $admin_id = $_SESSION['admin_id'];
 $allowedStatuses = ['Approved', 'Rejected'];
 
 if (!in_array($status, $allowedStatuses)) {
-    header("Location: ../../client_side/admin_reservations.php?view=requests");
+    header("Location: ../../client_side/admin_dashboard.php?view=requests");
     exit();
 }
 
@@ -34,6 +34,6 @@ $result = pg_query_params($conn, $sql, [
     $reservation_id
 ]);
 
-header("Location: ../../client_side/admin_reservations.php?view=requests");
+header("Location: ../../client_side/admin_dashboard.php?view=requests");
 exit();
 ?>

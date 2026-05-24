@@ -22,14 +22,14 @@ $sql = "SELECT reservation_id, student_id, status
 $result = pg_query_params($conn, $sql, [$reservation_id]);
 
 if (!$result || pg_num_rows($result) === 0) {
-    header("Location: ../../client_side/admin_reservations.php?view=requests");
+    header("Location: ../../client_side/admin_dashboard.php?view=requests");
     exit();
 }
 
 $reservation = pg_fetch_assoc($result);
 
 if ($reservation['status'] !== 'Approved') {
-    header("Location: ../../client_side/admin_reservations.php?view=requests");
+    header("Location: ../../client_side/admin_dashboard.php?view=requests");
     exit();
 }
 
@@ -47,6 +47,6 @@ pg_query_params($conn, $insertSql, [
     'Student did not show up for an approved reservation.'
 ]);
 
-header("Location: ../../client_side/admin_reservations.php?view=requests");
+header("Location: ../../client_side/admin_dashboard.php?view=requests");
 exit();
 ?>
