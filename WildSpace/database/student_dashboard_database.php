@@ -15,8 +15,8 @@ if (isset($_POST['create_reservation'])) {
     } elseif (!preg_match('/^[0-9]+$/', $capacity) || (int)$capacity <= 0) {
         $message = "Seats must be a valid number.";
         $messageType = "error";
-    } elseif ((int)$capacity > 10) {
-        $message = "A reservation can only accommodate up to 10 seats.";
+    } elseif ((int)$capacity > 1 && $space_type === 'Solo Table') {
+        $message = "Solo Table can only be selected for 1 seat.";
         $messageType = "error";
     } else {
         $insertSql = "INSERT INTO tblreservation 

@@ -482,6 +482,7 @@ select.form-input option {
                                     <th>ID</th>
                                     <th>Date</th>
                                     <th>Seats</th>
+                                    <th>Study Space</th>
                                     <th>Status</th>
                                     <th>Approved/Rejected By</th>
                                     <th>Action</th>
@@ -500,8 +501,9 @@ select.form-input option {
                                         <td>#<?php echo htmlspecialchars($row['reservation_id']); ?></td>
                                         <td><?php echo htmlspecialchars(formatReadableDate($row['reservation_date'])); ?></td>
                                         <td><?php echo htmlspecialchars($row['capacity']); ?> seats</td>
-                                        <td>
-                                            <span class="status-badge <?php echo reservationStatusClass($row['status']); ?>">
+<td><?php echo htmlspecialchars($row['space_type'] ?? 'Not specified'); ?></td>
+<td>
+    <span class="status-badge <?php echo reservationStatusClass($row['status']); ?>">
                                                 <?php echo htmlspecialchars($row['status']); ?>
                                             </span>
                                         </td>
@@ -575,17 +577,17 @@ select.form-input option {
 
                         <div class="form-group">
                             <label>Seats</label>
-                            <input type="number" name="capacity" class="form-input" min="1" max="10" required>
+                            <input type="number" id="capacityInput" name="capacity" class="form-input" min="1" max="10" required>
                         </div>
                         <div class="form-group">
     <label>Study Space Type</label>
-    <select name="space_type" class="form-input" required>
-        <option value="" disabled selected>Select study space</option>
-        <option value="Solo Table">Solo Table</option>
-        <option value="Quiet Room">Quiet Room</option>
-        <option value="Group Table">Group Table</option>
-        <option value="Discussion Room">Discussion Room</option>
-    </select>
+<select name="space_type" id="spaceTypeSelect" class="form-input" required>
+    <option value="" disabled selected hidden>Select study space</option>
+    <option value="Solo Table" id="soloTableOption">Solo Table</option>
+    <option value="Quiet Room">Quiet Room</option>
+    <option value="Group Table">Group Table</option>
+    <option value="Discussion Room">Discussion Room</option>
+</select>
 </div>
 
                         <button type="submit" name="create_reservation" class="submit-btn">
@@ -873,6 +875,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+const capacityInput = document.getElementById("capacityInput");
+const spaceTypeSelect = document.getElementById("spaceTypeSelect");
+const soloTableOption = document.getElementById("soloTableOption");
+
+function updateSoloTableOption() {
+    const seats = parseInt(capacityInput.value, 10);
+
+    if (seats > 1) {
+        soloTableOption.disabled = true;
+
+        if (spaceTypeSelect.value === "Solo Table") {
+            spaceTypeSelect.value = "";
+        }
+    } else {
+        soloTableOption.disabled = false;
+    }
+}
+
+if (capacityInput && spaceTypeSelect && soloTableOption) {
+    capacityInput.addEventListener("input", updateSoloTableOption);
+    capacityInput.addEventListener("change", updateSoloTableOption);
+
+    updateSoloTableOption();
+}
 </script>
 
 </body>
