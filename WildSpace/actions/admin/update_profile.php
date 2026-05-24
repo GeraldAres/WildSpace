@@ -11,7 +11,7 @@ $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
 if ($role === 'admin') {
-    $dashboard = "../../client_side/admin_reservations.php";
+    $dashboard = "../../client_side/admin_dashboard.php";
 } elseif ($role === 'student') {
     $dashboard = "../../client_side/student_dashboard.php";
 } else {
@@ -49,7 +49,7 @@ $sql = "UPDATE tbluser
             lastname = $2,
             mobile_number = $3,
             gender = $4
-        WHERE user_id = $5";
+        WHERE user_id = $5";    
 
 $result = pg_query_params($conn, $sql, [
     $firstname,

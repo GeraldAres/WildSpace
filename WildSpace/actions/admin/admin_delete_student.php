@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin_id'])) {
 }
 
 if (!isset($_GET['id'])) {
-    header('Location: ../../client_side/admin_reservations.php?view=students');
+    header('Location: ../../client_side/admin_dashboard.php?view=students');
     exit();
 }
 
@@ -36,7 +36,7 @@ $findStudent = pg_query_params(
 
 if (!$findStudent || pg_num_rows($findStudent) === 0) {
     pg_query($conn, 'ROLLBACK');
-    header('Location: ../../client_side/admin_reservations.php?view=students');
+    header('Location: ../../client_side/admin_dashboard.php?view=students');
     exit();
 }
 
@@ -69,5 +69,5 @@ if (!$deleteUser) {
 
 pg_query($conn, 'COMMIT');
 
-header('Location: ../../client_side/admin_reservations.php?view=students');
+header('Location: ../../client_side/admin_dashboard.php?view=students');
 exit();
