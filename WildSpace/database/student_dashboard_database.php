@@ -3,9 +3,10 @@
 if (isset($_POST['create_reservation'])) {
     $reservation_date = trim($_POST['reservation_date'] ?? '');
     $capacity = trim($_POST['capacity'] ?? '');
+    $space_type = trim($_POST['space_type'] ?? '');
     $today = date('Y-m-d');
 
-    if (empty($reservation_date) || empty($capacity)) {
+    if (empty($reservation_date) || empty($capacity) || empty($space_type)) {
         $message = "Please fill out all reservation fields.";
         $messageType = "error";
     } elseif ($reservation_date < $today) {
@@ -19,15 +20,16 @@ if (isset($_POST['create_reservation'])) {
         $messageType = "error";
     } else {
         $insertSql = "INSERT INTO tblreservation 
-                        (student_id, admin_id, status, reservation_date, date_created, capacity)
-                    VALUES 
-                        ($1, NULL, 'Pending', $2, NOW(), $3)";
+                (student_id, admin_id, status, reservation_date, date_created, capacity, space_type)
+            VALUES 
+                ($1, NULL, 'Pending', $2, NOW(), $3, $4)";
 
         $insertResult = pg_query_params($conn, $insertSql, [
-            $student_id,
-            $reservation_date,
-            $capacity
-        ]);
+    $student_id,
+    $reservation_date,
+    $capacity,
+    $space_type
+]);
 
         if ($insertResult) {
             $message = "Reservation request submitted successfully.";
@@ -60,6 +62,7 @@ $calendarSql = "SELECT
                 r.status,
                 r.reservation_date,
                 r.capacity,
+                r.space_type,
                 r.date_created,
                 admin_user.firstname AS admin_firstname,
                 admin_user.lastname AS admin_lastname,
@@ -88,6 +91,41 @@ $calendarReservations = [];
 while ($row = pg_fetch_assoc($calendarResult)) {
     $date = $row['reservation_date'];
     $calendarReservations[$date][] = $row;
+}
+/* STUDENT RESERVATION HISTORY CALENDAR */
+$historyCalendarSql = "SELECT 
+                r.reservation_id,
+                r.student_id,
+                r.admin_id,
+                r.status,
+                r.reservation_date,
+                r.capacity,
+                r.space_type,
+                r.date_created,
+                admin_user.firstname AS admin_firstname,
+                admin_user.lastname AS admin_lastname,
+                student_user.firstname AS student_firstname,
+                student_user.lastname AS student_lastname
+            FROM tblreservation r
+            LEFT JOIN tbladmin a ON r.admin_id = a.admin_id
+            LEFT JOIN tbluser admin_user ON a.user_id = admin_user.user_id
+            INNER JOIN tblstudent s ON r.student_id = s.student_id
+            INNER JOIN tbluser student_user ON s.user_id = student_user.user_id
+            WHERE r.reservation_date BETWEEN $1 AND $2
+            AND r.student_id = $3
+            ORDER BY r.reservation_date ASC";
+
+$historyCalendarResult = pg_query_params($conn, $historyCalendarSql, [$monthStart, $monthEnd, $student_id]);
+
+if (!$historyCalendarResult) {
+    die("History calendar query failed: " . pg_last_error($conn));
+}
+
+$historyCalendarReservations = [];
+
+while ($row = pg_fetch_assoc($historyCalendarResult)) {
+    $date = $row['reservation_date'];
+    $historyCalendarReservations[$date][] = $row;
 }
 
 /* STUDENT RESERVATIONS */
@@ -126,6 +164,7 @@ $sql = "SELECT
             r.status,
             r.reservation_date,
             r.capacity,
+            r.space_type,
             r.date_created,
             u.firstname AS admin_firstname,
             u.lastname AS admin_lastname
@@ -178,6 +217,7 @@ $violationsSql = "SELECT
                     v.violation_date,
                     r.reservation_date,
                     r.capacity,
+                    r.space_type,
                     u.firstname AS admin_firstname,
                     u.lastname AS admin_lastname
                   FROM tblviolation v

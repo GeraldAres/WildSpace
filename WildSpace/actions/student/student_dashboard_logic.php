@@ -12,6 +12,12 @@ $student_id = $_SESSION['student_id'];
 $message = "";
 $messageType = "";
 
+$view = $_GET['view'] ?? 'reservations';
+
+if (!in_array($view, ['reservations', 'book', 'reservation_history', 'violations'])) {
+    $view = 'reservations';
+}
+
 include __DIR__ . '/../../database/student_dashboard_database.php';
 
 function reservationStatusClass(string $status): string
@@ -38,11 +44,5 @@ function formatReadableDate(?string $date): string
     }
 
     return date("F d, Y", strtotime($date));
-}
-
-$view = $_GET['view'] ?? 'reservations';
-
-if (!in_array($view, ['reservations', 'book', 'violations'])) {
-    $view = 'reservations';
 }
 ?>

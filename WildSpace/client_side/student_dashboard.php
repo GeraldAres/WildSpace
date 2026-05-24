@@ -109,7 +109,7 @@ include '../actions/student/student_dashboard_logic.php';
 
         .reservation-form {
             display: grid;
-            grid-template-columns: 1fr 1fr auto;
+            grid-template-columns: 1fr 1fr 1fr auto;
             gap: 16px;
             align-items: end;
         }
@@ -345,6 +345,38 @@ include '../actions/student/student_dashboard_logic.php';
         .action-btn:hover {
             transform: translateY(-1px);
         }
+        .history-pill {
+    cursor: default;
+    pointer-events: none;
+}
+
+.history-pill:hover {
+    transform: none;
+    opacity: 1;
+}
+select.form-input,
+select.form-input:focus,
+select.form-input:valid {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    color: #eef2ff !important;
+    background-color: #1a2233 !important;
+    border: 1px solid rgba(250,204,21,0.65);
+    cursor: pointer;
+    padding-right: 55px;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20'%3E%3Cpath fill='%23eef2ff' d='M5.5 7.5L10 12l4.5-4.5L16 9l-6 6-6-6z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 28px center !important;
+    background-size: 16px !important;
+}
+
+select.form-input option {
+    background-color: #1a2233 !important;
+    color: #eef2ff !important;
+}
     </style>
 </head>
 
@@ -368,6 +400,12 @@ include '../actions/student/student_dashboard_logic.php';
                class="sidebar-link <?php echo $view === 'book' ? 'active' : ''; ?>">
                 <i class="fas fa-plus-circle"></i>
                 Book Study Space
+            </a>
+
+            <a href="student_dashboard.php?view=reservation_history"
+                class="sidebar-link <?php echo $view === 'reservation_history' ? 'active' : ''; ?>">
+                <i class="fas fa-clock-rotate-left"></i>
+                Reservation Calendar
             </a>
 
             <a href="student_dashboard.php?view=violations"
@@ -405,7 +443,7 @@ include '../actions/student/student_dashboard_logic.php';
                 <header class="dashboard-header">
                     <div class="dashboard-title">
                         <h1>My Reservations</h1>
-                        <p>View your study space booking requests and approval status.</p>
+                        <p>Manage your reservation requests, check approval status, and delete requests if needed.</p>
                     </div>
                 </header>
 
@@ -433,8 +471,8 @@ include '../actions/student/student_dashboard_logic.php';
 
                 <section class="table-card">
                     <div class="table-header">
-                        <h2>Reservation History</h2>
-                        <p>Latest reservations connected to your student account</p>
+                        <h2>Reservation Requests</h2>
+                        <p>A list of your submitted booking requests and their current review status.</p>
                     </div>
 
                     <div class="table-container">
@@ -539,6 +577,16 @@ include '../actions/student/student_dashboard_logic.php';
                             <label>Seats</label>
                             <input type="number" name="capacity" class="form-input" min="1" max="10" required>
                         </div>
+                        <div class="form-group">
+    <label>Study Space Type</label>
+    <select name="space_type" class="form-input" required>
+        <option value="" disabled selected>Select study space</option>
+        <option value="Solo Table">Solo Table</option>
+        <option value="Quiet Room">Quiet Room</option>
+        <option value="Group Table">Group Table</option>
+        <option value="Discussion Room">Discussion Room</option>
+    </select>
+</div>
 
                         <button type="submit" name="create_reservation" class="submit-btn">
                             Submit Request
@@ -582,32 +630,38 @@ include '../actions/student/student_dashboard_logic.php';
                                             $isOwnReservation = (int)$reservation['student_id'] === (int)$student_id;
                                         ?>
 
-                                        <?php if ($isOwnReservation) { ?>
-                                            <button
-                                                type="button"
-                                                class="calendar-reservation <?php echo reservationStatusClass($reservation['status']); ?>"
-                                                data-id="<?php echo htmlspecialchars($reservation['reservation_id']); ?>"
-                                                data-student-name="<?php echo htmlspecialchars(trim($reservation['student_firstname'] . ' ' . $reservation['student_lastname'])); ?>"
-                                                data-date="<?php echo htmlspecialchars(formatReadableDate($reservation['reservation_date'])); ?>"
-                                                data-capacity="<?php echo htmlspecialchars($reservation['capacity']); ?>"
-                                                data-status="<?php echo htmlspecialchars($reservation['status']); ?>"
-                                                data-approved-by="<?php
-                                                    if ($reservation['status'] === 'Approved' && !empty($reservation['admin_firstname'])) {
-                                                        echo htmlspecialchars(trim($reservation['admin_firstname'] . ' ' . $reservation['admin_lastname']));
-                                                    } else {
-                                                        echo 'Not yet approved';
-                                                    }
-                                                ?>"
-                                            >
-                                                <?php echo htmlspecialchars($reservation['capacity']); ?> seats -
-                                                <?php echo htmlspecialchars($reservation['status']); ?>
-                                            </button>
-                                        <?php } else { ?>
-                                            <div class="calendar-reservation other-approved" title="Approved reservation by another student">
-                                                <?php echo htmlspecialchars(trim($reservation['student_firstname'] . ' ' . $reservation['student_lastname'])); ?><br>
-                                                <?php echo htmlspecialchars($reservation['capacity']); ?> seats
-                                            </div>
-                                        <?php } ?>
+<?php if ($isOwnReservation) { ?>
+    <button
+        type="button"
+        class="calendar-reservation <?php echo reservationStatusClass($reservation['status']); ?>"
+        data-id="<?php echo htmlspecialchars($reservation['reservation_id']); ?>"
+        data-student-name="<?php echo htmlspecialchars(trim($reservation['student_firstname'] . ' ' . $reservation['student_lastname'])); ?>"
+        data-date="<?php echo htmlspecialchars(formatReadableDate($reservation['reservation_date'])); ?>"
+        data-capacity="<?php echo htmlspecialchars($reservation['capacity']); ?>"
+        data-space-type="<?php echo htmlspecialchars($reservation['space_type'] ?? 'Not specified'); ?>"
+        data-status="<?php echo htmlspecialchars($reservation['status']); ?>"
+        data-approved-by="<?php
+            if ($reservation['status'] === 'Approved' && !empty($reservation['admin_firstname'])) {
+                echo htmlspecialchars(trim($reservation['admin_firstname'] . ' ' . $reservation['admin_lastname']));
+            } else {
+                echo 'Not yet approved';
+            }
+        ?>"
+    >
+        <strong>
+    <?php echo htmlspecialchars(trim($reservation['student_firstname'] . ' ' . $reservation['student_lastname'])); ?>
+    </strong><br>
+    <?php echo htmlspecialchars($reservation['capacity']); ?> seats -
+    <?php echo htmlspecialchars($reservation['status']); ?>
+    </button>
+<?php } else { ?>
+    <div class="calendar-reservation other-approved" title="Approved reservation by another student">
+        <strong>
+    <?php echo htmlspecialchars(trim($reservation['student_firstname'] . ' ' . $reservation['student_lastname'])); ?>
+</strong><br>
+<?php echo htmlspecialchars($reservation['capacity']); ?> seats
+    </div>
+<?php } ?>
 
                                     <?php } ?>
 
@@ -619,21 +673,78 @@ include '../actions/student/student_dashboard_logic.php';
             </section>
 
         <?php } ?>
+        <?php if ($view === 'reservation_history') { ?>
+
+    <section class="admin-panel active">
+        <header class="dashboard-header">
+            <div class="dashboard-title">
+                <h1>Reservation Calendar History</h1>
+                <p>View your submitted reservations by date in a read-only calendar.</p>
+            </div>
+        </header>
+
+        <section class="calendar-wrapper">
+            <div class="calendar-header">
+                <h2><?php echo htmlspecialchars($monthTitle); ?></h2>
+
+                <div class="calendar-nav">
+                    <a href="student_dashboard.php?view=reservation_history&month=<?php echo $prevMonth; ?>">Prev</a>
+                    <a href="student_dashboard.php?view=reservation_history&month=<?php echo $nextMonth; ?>">Next</a>
+                </div>
+            </div>
+
+            <div class="calendar-grid">
+                <div class="calendar-day-name">Mon</div>
+                <div class="calendar-day-name">Tue</div>
+                <div class="calendar-day-name">Wed</div>
+                <div class="calendar-day-name">Thu</div>
+                <div class="calendar-day-name">Fri</div>
+                <div class="calendar-day-name">Sat</div>
+                <div class="calendar-day-name">Sun</div>
+
+                <?php for ($blank = 1; $blank < $firstDayOfMonth; $blank++) { ?>
+                    <div class="calendar-day"></div>
+                <?php } ?>
+
+                <?php for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $date = $currentMonth . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                ?>
+                    <div class="calendar-day">
+                        <div class="calendar-date"><?php echo $day; ?></div>
+
+                        <?php if (isset($historyCalendarReservations[$date])) { ?>
+                            <?php foreach ($historyCalendarReservations[$date] as $reservation) { ?>
+                                <?php if ((int)$reservation['student_id'] === (int)$student_id) { ?>
+                                    <div class="calendar-reservation <?php echo reservationStatusClass($reservation['status']); ?> history-pill">
+                                        <?php echo htmlspecialchars(trim($reservation['student_firstname'] . ' ' . $reservation['student_lastname'])); ?><br>
+                                        <?php echo htmlspecialchars($reservation['capacity']); ?> seats<br>
+                                        <?php echo htmlspecialchars($reservation['status']); ?>
+                                    </div>
+                                <?php } ?>
+                            <?php } ?>
+                        <?php } ?>
+                    </div>
+                <?php } ?>
+            </div>
+        </section>
+    </section>
+
+<?php } ?>
 
         <?php if ($view === 'violations') { ?>
 
             <section class="admin-panel active">
                 <header class="dashboard-header">
                     <div class="dashboard-title">
-                        <h1>Violation History</h1>
-                        <p>View violations marked by administrators.</p>
+                        <h1>No-Show Violations</h1>
+                        <p>View records of missed approved reservations.</p>
                     </div>
                 </header>
 
                 <section class="table-card">
                     <div class="table-header">
-                        <h2>No-Shows</h2>
-                        <p>Records of no-show violations from approved reservations</p>
+                        <h2>Violation Records</h2>
+                        <p>Students marked for failing to attend approved reservations.</p>
                     </div>
 
                     <div class="table-container">
@@ -718,6 +829,7 @@ include '../actions/student/student_dashboard_logic.php';
         <p><strong>Reservation ID:</strong> <span id="modalReservationId"></span></p>
         <p><strong>Date:</strong> <span id="modalDate"></span></p>
         <p><strong>Seats:</strong> <span id="modalCapacity"></span> seats</p>
+        <p><strong>Study Space:</strong> <span id="modalSpaceType"></span></p>
         <p><strong>Status:</strong> <span id="modalStatus"></span></p>
         <p><strong>Approved By:</strong> <span id="modalApprovedBy"></span></p>
 
@@ -743,6 +855,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("modalReservationId").textContent = pill.dataset.id;
             document.getElementById("modalDate").textContent = pill.dataset.date;
             document.getElementById("modalCapacity").textContent = pill.dataset.capacity;
+            document.getElementById("modalSpaceType").textContent = pill.dataset.spaceType;
             document.getElementById("modalStatus").textContent = pill.dataset.status;
             document.getElementById("modalApprovedBy").textContent = pill.dataset.approvedBy;
 
