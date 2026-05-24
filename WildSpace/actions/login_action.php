@@ -82,7 +82,7 @@ if ($adminResult && pg_num_rows($adminResult) > 0) {
 
     unset($_SESSION['login_error']);
 
-    header("Location: ../client_side/admin_reservations.php");
+    header("Location: ../client_side/admin_dashboard.php");
     exit();
 }
 

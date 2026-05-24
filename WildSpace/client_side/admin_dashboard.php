@@ -13,6 +13,24 @@ if (!in_array($view, ['students', 'requests'], true)) {
 }
 
 /* ================= STUDENTS ================= */
+$studentsPerPage = 10;
+$studentPage = isset($_GET['page']) && is_numeric($_GET['page']) && (int)$_GET['page'] > 0
+    ? (int)$_GET['page']
+    : 1;
+
+$studentCountSql = "SELECT COUNT(*) AS total_students FROM tblstudent";
+$studentCountResult = pg_query($conn, $studentCountSql);
+
+if (!$studentCountResult) {
+    die('Query failed: ' . pg_last_error($conn));
+}
+
+$studentCountRow = pg_fetch_assoc($studentCountResult);
+$studentTotal = (int)($studentCountRow['total_students'] ?? 0);
+$studentPageCount = max(1, (int)ceil($studentTotal / $studentsPerPage));
+$studentPage = min($studentPage, $studentPageCount);
+$studentOffset = ($studentPage - 1) * $studentsPerPage;
+
 $studentsSql = "SELECT
         s.student_id,
         s.user_id,
@@ -24,7 +42,8 @@ $studentsSql = "SELECT
         (SELECT COUNT(*) FROM tblreservation r WHERE r.student_id = s.student_id) AS reservation_count
     FROM tblstudent s
     INNER JOIN tbluser u ON s.user_id = u.user_id
-    ORDER BY u.firstname ASC, u.lastname ASC";
+    ORDER BY u.firstname ASC, u.lastname ASC
+    LIMIT $studentsPerPage OFFSET $studentOffset";
 
 $studentsResult = pg_query($conn, $studentsSql);
 
@@ -33,11 +52,9 @@ if (!$studentsResult) {
 }
 
 $students = [];
-$studentTotal = 0;
 
 while ($row = pg_fetch_assoc($studentsResult)) {
     $students[] = $row;
-    $studentTotal++;
 }
 
 /* ================= RESERVATION REQUESTS ================= */
@@ -236,6 +253,24 @@ function reservationStatusClass(string $status): string
                             <?php } ?>
                         </tbody>
                     </table>
+                </div>
+
+                <div class="pagination-controls">
+                    <a class="pagination-btn<?php echo $studentPage <= 1 ? ' disabled' : ''; ?>"
+                       href="?view=students&page=<?php echo max(1, $studentPage - 1); ?>"
+                       <?php if ($studentPage <= 1) echo 'aria-disabled="true" tabindex="-1"'; ?>>
+                        &laquo; Previous
+                    </a>
+
+                    <span class="pagination-info">
+                        Page <?php echo $studentPage; ?> of <?php echo $studentPageCount; ?>
+                    </span>
+
+                    <a class="pagination-btn<?php echo $studentPage >= $studentPageCount ? ' disabled' : ''; ?>"
+                       href="?view=students&page=<?php echo min($studentPageCount, $studentPage + 1); ?>"
+                       <?php if ($studentPage >= $studentPageCount) echo 'aria-disabled="true" tabindex="-1"'; ?>>
+                        Next &raquo;
+                    </a>
                 </div>
             </section>
         </section>

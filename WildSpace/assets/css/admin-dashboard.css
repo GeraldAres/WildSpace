@@ -237,6 +237,49 @@ body {
     overflow-x: auto;
 }
 
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: rgba(255,255,255,0.03);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(250,204,21,1), rgba(253,186,116,0.95));
+    color: #08101f;
+    border: 1px solid transparent;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: 0.2s ease;
+}
+
+.pagination-btn:hover {
+    transform: translateY(-1px);
+}
+
+.pagination-btn.disabled,
+.pagination-btn[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none;
+}
+
+.pagination-info {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
