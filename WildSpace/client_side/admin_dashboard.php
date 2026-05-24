@@ -8,151 +8,11 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin_id'])) {
 }
 
 $view = $_GET['view'] ?? 'students';
-if (!in_array($view, ['students', 'requests', 'summary'], true)) {
+if (!in_array($view, ['students', 'requests', 'file_violation', 'violation_form', 'summary'], true)) {
     $view = 'students';
 }
 
-/* ================= STUDENTS ================= */
-$studentsPerPage = 10;
-$studentPage = isset($_GET['page']) && is_numeric($_GET['page']) && (int)$_GET['page'] > 0
-    ? (int)$_GET['page']
-    : 1;
-
-$studentCountSql = "SELECT COUNT(*) AS total_students FROM tblstudent";
-$studentCountResult = pg_query($conn, $studentCountSql);
-
-if (!$studentCountResult) {
-    die('Query failed: ' . pg_last_error($conn));
-}
-
-$studentCountRow = pg_fetch_assoc($studentCountResult);
-$studentTotal = (int)($studentCountRow['total_students'] ?? 0);
-$studentPageCount = max(1, (int)ceil($studentTotal / $studentsPerPage));
-$studentPage = min($studentPage, $studentPageCount);
-$studentOffset = ($studentPage - 1) * $studentsPerPage;
-
-$studentsSql = "SELECT
-        s.student_id,
-        s.user_id,
-        u.firstname,
-        u.lastname,
-        u.email,
-        u.mobile_number,
-        u.gender,
-        (SELECT COUNT(*) FROM tblreservation r WHERE r.student_id = s.student_id) AS reservation_count
-    FROM tblstudent s
-    INNER JOIN tbluser u ON s.user_id = u.user_id
-    ORDER BY u.firstname ASC, u.lastname ASC
-    LIMIT $studentsPerPage OFFSET $studentOffset";
-
-$studentsResult = pg_query($conn, $studentsSql);
-
-if (!$studentsResult) {
-    die('Query failed: ' . pg_last_error($conn));
-}
-
-$students = [];
-
-while ($row = pg_fetch_assoc($studentsResult)) {
-    $students[] = $row;
-}
-
-/* ================= RESERVATION REQUESTS ================= */
-$requestsPerPage = 10;
-$requestPage = isset($_GET['request_page']) && is_numeric($_GET['request_page']) && (int)$_GET['request_page'] > 0
-    ? (int)$_GET['request_page']
-    : 1;
-
-$requestCountSql = "SELECT
-        COUNT(*) AS total_requests,
-        SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) AS pending_requests,
-        SUM(CASE WHEN status = 'Approved' THEN 1 ELSE 0 END) AS approved_requests,
-        SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) AS rejected_requests
-    FROM tblreservation";
-$requestCountResult = pg_query($conn, $requestCountSql);
-
-if (!$requestCountResult) {
-    die('Query failed: ' . pg_last_error($conn));
-}
-
-$requestCountRow = pg_fetch_assoc($requestCountResult);
-$requestTotal = (int)($requestCountRow['total_requests'] ?? 0);
-$pending = (int)($requestCountRow['pending_requests'] ?? 0);
-$approved = (int)($requestCountRow['approved_requests'] ?? 0);
-$rejected = (int)($requestCountRow['rejected_requests'] ?? 0);
-$total = $requestTotal;
-
-$violationCountSql = "SELECT COUNT(DISTINCT s.student_id) AS violation_students
-    FROM tblviolation v
-    INNER JOIN tblreservation r ON v.reservation_id = r.reservation_id
-    INNER JOIN tblstudent s ON r.student_id = s.student_id";
-$violationCountResult = pg_query($conn, $violationCountSql);
-
-if (!$violationCountResult) {
-    die('Query failed: ' . pg_last_error($conn));
-}
-
-$violationCountRow = pg_fetch_assoc($violationCountResult);
-$violationStudents = (int)($violationCountRow['violation_students'] ?? 0);
-
-$requestPageCount = max(1, (int)ceil($requestTotal / $requestsPerPage));
-$requestPage = min($requestPage, $requestPageCount);
-$requestOffset = ($requestPage - 1) * $requestsPerPage;
-
-$requestsSql = "SELECT
-        r.reservation_id,
-        r.student_id,
-        r.admin_id,
-        r.status,
-        r.reservation_date,
-        r.capacity,
-        r.date_created,
-        s.user_id,
-        u.firstname,
-        u.lastname,
-        u.email,
-        u.mobile_number,
-        v.violation_id
-    FROM tblreservation r
-    INNER JOIN tblstudent s ON r.student_id = s.student_id
-    INNER JOIN tbluser u ON s.user_id = u.user_id
-    LEFT JOIN tblviolation v ON r.reservation_id = v.reservation_id
-    WHERE r.status = 'Pending'
-    ORDER BY r.date_created DESC
-    LIMIT $requestsPerPage OFFSET $requestOffset";
-
-$approvedPercent = $requestTotal > 0 ? round(($approved / $requestTotal) * 100, 1) : 0;
-$pendingPercent = $requestTotal > 0 ? round(($pending / $requestTotal) * 100, 1) : 0;
-$rejectedPercent = $requestTotal > 0 ? round(($rejected / $requestTotal) * 100, 1) : 0;
-
-$summaryData = [
-    'total' => $requestTotal,
-    'pending' => $pending,
-    'approved' => $approved,
-    'rejected' => $rejected,
-    'violations' => $violationStudents,
-    'approvedPercent' => $approvedPercent,
-    'pendingPercent' => $pendingPercent,
-    'rejectedPercent' => $rejectedPercent,
-];
-
-if (isset($_GET['summary_data'])) {
-    header('Content-Type: application/json');
-    echo json_encode($summaryData);
-    exit();
-}
-
-$requestsResult = pg_query($conn, $requestsSql);
-
-if (!$requestsResult) {
-    die('Query failed: ' . pg_last_error($conn));
-}
-
-$requests = [];
-
-while ($row = pg_fetch_assoc($requestsResult)) {
-    $requests[] = $row;
-}
+include __DIR__ . '/../database/admin_dashboard_database.php';
 
 function formatReadableDate(?string $date): string
 {
@@ -210,6 +70,12 @@ function reservationStatusClass(string $status): string
                data-panel="requests">
                 <i class="fas fa-calendar-check"></i>
                 Student Request
+            </a>
+            <a href="?view=file_violation"
+            class="sidebar-link <?php echo $view === 'file_violation' || $view === 'violation_form' ? 'active' : ''; ?>"
+            data-panel="file_violation">
+                <i class="fas fa-triangle-exclamation"></i>
+                File a Violation
             </a>
 
             <a href="?view=summary"
@@ -375,8 +241,8 @@ function reservationStatusClass(string $status): string
                             <tr>
                                 <th>Reservation ID</th>
                                 <th>Student Name</th>
-                                <th>Email</th>
                                 <th>Booking Date</th>
+                                <th>Study Space Type</th>
                                 <th>Capacity</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -398,8 +264,8 @@ function reservationStatusClass(string $status): string
                                         </div>
                                         <div class="muted">User ID: <?php echo htmlspecialchars($request['user_id']); ?></div>
                                     </td>
-                                    <td class="email-text"><?php echo htmlspecialchars($request['email']); ?></td>
                                     <td><?php echo formatReadableDate($request['reservation_date']); ?></td>
+                                    <td><?php echo htmlspecialchars($request['space_type'] ?? 'Not specified'); ?></td>
                                     <td><?php echo htmlspecialchars($request['capacity']); ?> people</td>
                                     <td>
                                         <span class="<?php echo reservationStatusClass($request['status']); ?>">
@@ -450,6 +316,150 @@ function reservationStatusClass(string $status): string
                 </div>
             </section>
         </section>
+
+        <section id="panel-file_violation"
+         class="admin-panel <?php echo $view === 'file_violation' ? 'active' : ''; ?>">
+    <header class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>File a Violation</h1>
+            <p>Select an approved reservation and file a violation record.</p>
+        </div>
+    </header>
+
+    <section class="table-card">
+        <div class="table-header">
+            <h2>Approved Reservations</h2>
+            <p>Only approved reservations without existing violations are shown.</p>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reservation ID</th>
+                        <th>Student Name</th>
+                        <th>Study Space Type</th>
+                        <th>Booking Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <?php if (count($approvedReservations) === 0) { ?>
+                        <tr>
+                            <td colspan="5" class="muted">No approved reservations available for violation filing.</td>
+                        </tr>
+                    <?php } ?>
+
+                    <?php foreach ($approvedReservations as $reservation) { ?>
+                        <tr>
+                            <td>#<?php echo htmlspecialchars($reservation['reservation_id']); ?></td>
+                            <td><?php echo htmlspecialchars(trim($reservation['firstname'] . ' ' . $reservation['lastname'])); ?></td>
+                            <td><?php echo htmlspecialchars($reservation['space_type'] ?? 'Not specified'); ?></td>
+                            <td><?php echo formatReadableDate($reservation['reservation_date']); ?></td>
+                            <td>
+                                <a class="action-btn reject-btn"
+                                   href="?view=violation_form&id=<?php echo urlencode($reservation['reservation_id']); ?>">
+                                    File Violation
+                                </a>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+
+<?php if ($view === 'violation_form' && isset($_GET['id'])) { ?>
+<section id="panel-violation_form" class="admin-panel active">
+
+    <header class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>Violation Form</h1>
+            <p>Record student violations related to approved reservations.</p>
+        </div>
+    </header>
+
+    <div class="violation-form-card">
+
+        <div class="violation-form-header">
+            <h2>File Student Violation</h2>
+            <p>
+                Complete the form below to document violations committed during the reservation period.
+            </p>
+        </div>
+
+        <form method="POST"
+              action="../actions/admin/file_violation.php"
+              class="violation-form-body">
+
+            <input type="hidden"
+                   name="reservation_id"
+                   value="<?php echo htmlspecialchars($_GET['id']); ?>">
+
+            <div class="violation-info-grid">
+
+                <div class="violation-info-box">
+                    <span>Reservation ID</span>
+                    <strong>
+                        #<?php echo htmlspecialchars($_GET['id']); ?>
+                    </strong>
+                </div>
+
+                <div class="violation-info-box">
+                    <span>Status</span>
+                    <strong>Approved Reservation</strong>
+                </div>
+
+            </div>
+
+            <div class="violation-field">
+                <label>Violation Type</label>
+
+                <select name="violation_type" required>
+                    <option value="" disabled selected>
+                        Select violation type
+                    </option>
+
+                    <option value="Noise Complaint">
+                        Noise Complaint
+                    </option>
+
+                    <option value="Misuse of Study Space">
+                        Misuse of Study Space
+                    </option>
+
+                    <option value="Damage to Property">
+                        Damage to Property
+                    </option>
+
+                    <option value="Leaving Area Unclean">
+                        Leaving Area Unclean
+                    </option>
+                </select>
+            </div>
+
+            <div class="violation-field">
+                <label>Description</label>
+
+                <textarea
+                    name="description"
+                    placeholder="Provide a detailed explanation of the violation..."
+                    required></textarea>
+            </div>
+
+            <button type="submit"
+                    name="file_violation"
+                    class="violation-submit">
+                Submit Violation Report
+            </button>
+
+        </form>
+    </div>
+</section>
+<?php } ?>
+
 
         <!-- STUDENT SUMMARY (analytics and overview) -->
         <section id="panel-summary"
