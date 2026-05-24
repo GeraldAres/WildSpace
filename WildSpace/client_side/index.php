@@ -36,11 +36,48 @@
             </div>
         </div>
 
-        <div class="hero-right">
-            <div class="image-container">
-                <img src="../assets/images/person5.png" alt="Professional with briefcase" class="hero-image">
+        <aside class="hero-right" aria-labelledby="hero-right-heading">
+            <div class="feature-card" style="margin-bottom:1rem;">
+                <h3 id="hero-right-heading" style="margin-bottom:0.5rem;">Quick Actions</h3>
+                <p style="color:var(--text-muted);margin-bottom:1rem;">Sign in or make a reservation in seconds.</p>
+                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                    <button class="cta-button" onclick="location.href='login.php'">Log In</button>
+                    <button class="cta-button" onclick="location.href='register.php'">Register</button>
+                    <a class="secondary-link" href="book.php">Book Now</a>
+                </div>
             </div>
-        </div>
+
+            <div class="feature-card" style="margin-bottom:1rem;">
+                <h4 style="margin-bottom:0.75rem;">At a glance</h4>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                    <div style="background:rgba(255,255,255,0.02);padding:0.75rem;border-radius:12px;text-align:center;">
+                        <div style="font-weight:800;font-size:1.25rem;color:var(--text-main);">34</div>
+                        <div style="font-size:0.85rem;color:var(--text-muted);">Spaces</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.02);padding:0.75rem;border-radius:12px;text-align:center;">
+                        <div style="font-weight:800;font-size:1.25rem;color:var(--text-main);">12</div>
+                        <div style="font-size:0.85rem;color:var(--text-muted);">Active Bookings</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.02);padding:0.75rem;border-radius:12px;text-align:center;">
+                        <div style="font-weight:800;font-size:1.25rem;color:var(--text-main);">4</div>
+                        <div style="font-size:0.85rem;color:var(--text-muted);">Popular Rooms</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.02);padding:0.75rem;border-radius:12px;text-align:center;">
+                        <div style="font-weight:800;font-size:1.25rem;color:var(--text-main);">97%</div>
+                        <div style="font-size:0.85rem;color:var(--text-muted);">On-time</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <h4 style="margin-bottom:0.5rem;">How it works</h4>
+                <ol style="color:var(--text-muted);padding-left:1.1rem;">
+                    <li style="margin-bottom:0.5rem;">Choose date & time</li>
+                    <li style="margin-bottom:0.5rem;">Pick a space</li>
+                    <li style="margin-bottom:0.5rem;">Confirm reservation</li>
+                </ol>
+            </div>
+        </aside>
     </section>
 
     <section class="feature-strip">
