@@ -55,7 +55,7 @@ if (!$updateResult) {
     exit();
 }
 
-$_SESSION['login_error'] = "Password reset successful. Please log in using your new password.";
+$_SESSION['login_success'] = "Password reset successful. Please log in using your new password.";
 header("Location: ../client_side/login.php");
 exit();
 ?>

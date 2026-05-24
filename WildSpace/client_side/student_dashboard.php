@@ -371,15 +371,15 @@ include '../actions/student/student_dashboard_logic.php';
             <section class="admin-panel active">
                 <header class="dashboard-header">
                     <div class="dashboard-title">
-                        <h1>No-Show Violations</h1>
-                        <p>View records of missed approved reservations.</p>
+                        <h1>Violation Records</h1>
+                        <p>View violation records of filed approved reservations.</p>
                     </div>
                 </header>
 
                 <section class="table-card">
                     <div class="table-header">
-                        <h2>Violation Records</h2>
-                        <p>Students marked for failing to attend approved reservations.</p>
+                        <h2>Filed Reservation Violations</h2>
+                        <p>Review violations recorded against your approved study space reservations.</p>
                     </div>
 
                     <div class="table-container">

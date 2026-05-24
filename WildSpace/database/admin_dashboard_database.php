@@ -69,18 +69,18 @@ $approved = (int)($requestCountRow['approved_requests'] ?? 0);
 $rejected = (int)($requestCountRow['rejected_requests'] ?? 0);
 $total = $requestTotal;
 
-$violationCountSql = "SELECT COUNT(DISTINCT s.student_id) AS violation_students
-    FROM tblviolation v
-    INNER JOIN tblreservation r ON v.reservation_id = r.reservation_id
-    INNER JOIN tblstudent s ON r.student_id = s.student_id";
-$violationCountResult = pg_query($conn, $violationCountSql);
+$violationCountSql = "SELECT COUNT(*) AS admin_violations
+    FROM tblviolation
+    WHERE admin_id = $1";
+
+$violationCountResult = pg_query_params($conn, $violationCountSql, [$_SESSION['admin_id']]);
 
 if (!$violationCountResult) {
     die('Query failed: ' . pg_last_error($conn));
 }
 
 $violationCountRow = pg_fetch_assoc($violationCountResult);
-$violationStudents = (int)($violationCountRow['violation_students'] ?? 0);
+$violationStudents = (int)($violationCountRow['admin_violations'] ?? 0);
 
 $requestPageCount = max(1, (int)ceil($requestTotal / $requestsPerPage));
 $requestPage = min($requestPage, $requestPageCount);
