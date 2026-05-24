@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin_id'])) {
 }
 
 $view = $_GET['view'] ?? 'students';
-if (!in_array($view, ['students', 'requests'], true)) {
+if (!in_array($view, ['students', 'requests', 'summary'], true)) {
     $view = 'students';
 }
 
@@ -82,6 +82,19 @@ $approved = (int)($requestCountRow['approved_requests'] ?? 0);
 $rejected = (int)($requestCountRow['rejected_requests'] ?? 0);
 $total = $requestTotal;
 
+$violationCountSql = "SELECT COUNT(DISTINCT s.student_id) AS violation_students
+    FROM tblviolation v
+    INNER JOIN tblreservation r ON v.reservation_id = r.reservation_id
+    INNER JOIN tblstudent s ON r.student_id = s.student_id";
+$violationCountResult = pg_query($conn, $violationCountSql);
+
+if (!$violationCountResult) {
+    die('Query failed: ' . pg_last_error($conn));
+}
+
+$violationCountRow = pg_fetch_assoc($violationCountResult);
+$violationStudents = (int)($violationCountRow['violation_students'] ?? 0);
+
 $requestPageCount = max(1, (int)ceil($requestTotal / $requestsPerPage));
 $requestPage = min($requestPage, $requestPageCount);
 $requestOffset = ($requestPage - 1) * $requestsPerPage;
@@ -104,8 +117,30 @@ $requestsSql = "SELECT
     INNER JOIN tblstudent s ON r.student_id = s.student_id
     INNER JOIN tbluser u ON s.user_id = u.user_id
     LEFT JOIN tblviolation v ON r.reservation_id = v.reservation_id
+    WHERE r.status = 'Pending'
     ORDER BY r.date_created DESC
     LIMIT $requestsPerPage OFFSET $requestOffset";
+
+$approvedPercent = $requestTotal > 0 ? round(($approved / $requestTotal) * 100, 1) : 0;
+$pendingPercent = $requestTotal > 0 ? round(($pending / $requestTotal) * 100, 1) : 0;
+$rejectedPercent = $requestTotal > 0 ? round(($rejected / $requestTotal) * 100, 1) : 0;
+
+$summaryData = [
+    'total' => $requestTotal,
+    'pending' => $pending,
+    'approved' => $approved,
+    'rejected' => $rejected,
+    'violations' => $violationStudents,
+    'approvedPercent' => $approvedPercent,
+    'pendingPercent' => $pendingPercent,
+    'rejectedPercent' => $rejectedPercent,
+];
+
+if (isset($_GET['summary_data'])) {
+    header('Content-Type: application/json');
+    echo json_encode($summaryData);
+    exit();
+}
 
 $requestsResult = pg_query($conn, $requestsSql);
 
@@ -175,6 +210,13 @@ function reservationStatusClass(string $status): string
                data-panel="requests">
                 <i class="fas fa-calendar-check"></i>
                 Student Request
+            </a>
+
+            <a href="?view=summary"
+               class="sidebar-link <?php echo $view === 'summary' ? 'active' : ''; ?>"
+               data-panel="summary">
+                <i class="fas fa-chart-bar"></i>
+                Student Summary
             </a>
         </nav>
 
@@ -331,69 +373,54 @@ function reservationStatusClass(string $status): string
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Student</th>
-                                <th>Contact</th>
-                                <th>Date</th>
+                                <th>Reservation ID</th>
+                                <th>Student Name</th>
+                                <th>Email</th>
+                                <th>Booking Date</th>
                                 <th>Capacity</th>
                                 <th>Status</th>
-                                <th>Submitted</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (count($requests) === 0) { ?>
                                 <tr>
-                                    <td colspan="8" class="muted">No booking requests yet.</td>
+                                    <td colspan="7" class="muted">No pending requests at this time.</td>
                                 </tr>
                             <?php } ?>
 
-                            <?php foreach ($requests as $row) {
-                                $statusClass = reservationStatusClass($row['status']);
-                                $fullName = trim($row['firstname'] . ' ' . $row['lastname']);
-                                ?>
+                            <?php foreach ($requests as $request) { ?>
                                 <tr>
-                                    <td>#<?php echo htmlspecialchars($row['reservation_id']); ?></td>
+                                    <td>#<?php echo htmlspecialchars($request['reservation_id']); ?></td>
                                     <td>
-                                        <div class="name-text"><?php echo htmlspecialchars($fullName); ?></div>
-                                        <div class="muted"><?php echo htmlspecialchars($row['email']); ?></div>
+                                        <div class="name-text">
+                                            <?php echo htmlspecialchars(trim($request['firstname'] . ' ' . $request['lastname'])); ?>
+                                        </div>
+                                        <div class="muted">User ID: <?php echo htmlspecialchars($request['user_id']); ?></div>
                                     </td>
-                                    <td class="muted"><?php echo htmlspecialchars($row['mobile_number']); ?></td>
-                                    <td><?php echo htmlspecialchars(formatReadableDate($row['reservation_date'])); ?></td>
-                                    <td><?php echo htmlspecialchars($row['capacity']); ?> seats</td>
+                                    <td class="email-text"><?php echo htmlspecialchars($request['email']); ?></td>
+                                    <td><?php echo formatReadableDate($request['reservation_date']); ?></td>
+                                    <td><?php echo htmlspecialchars($request['capacity']); ?> people</td>
                                     <td>
-                                        <span class="status-badge <?php echo $statusClass; ?>">
-                                            <?php echo htmlspecialchars($row['status']); ?>
+                                        <span class="<?php echo reservationStatusClass($request['status']); ?>">
+                                            <?php echo htmlspecialchars($request['status']); ?>
                                         </span>
                                     </td>
-                                    <td class="muted"><?php echo htmlspecialchars(formatReadableDate($row['date_created'])); ?></td>
                                     <td>
                                         <div class="actions">
-                                            <?php if ($row['status'] === 'Pending') { ?>
-                                                <a class="action-btn approve-btn"
-                                                   href="../actions/admin/update_reservation_status.php?id=<?php echo urlencode($row['reservation_id']); ?>&status=Approved"
-                                                   onclick="return confirm('Approve this reservation?');">
-                                                    Approve
-                                                </a>
-                                                <a class="action-btn reject-btn"
-                                                   href="../actions/admin/update_reservation_status.php?id=<?php echo urlencode($row['reservation_id']); ?>&status=Rejected"
-                                                   onclick="return confirm('Reject this reservation?');">
-                                                    Reject
-                                                </a>
-                                            <?php } else { ?>
-                                                <span class="empty-action">Reviewed</span>
-                                            <?php } ?>
-                                            <?php if ($row['status'] === 'Approved' && empty($row['violation_id'])) { ?>
-                                                <a class="action-btn reject-btn"
-                                                href="../actions/admin/add_violation.php?id=<?php echo urlencode($row['reservation_id']); ?>"
-                                                onclick="return confirm('Mark this student as no-show and add a violation?');">
-                                                    No Show
-                                                </a>
-                                            <?php } ?>
-
+                                            <a class="action-btn approve-btn"
+                                               href="../actions/admin/update_reservation_status.php?id=<?php echo urlencode($request['reservation_id']); ?>&status=Approved"
+                                               onclick="return confirm('Approve this reservation?');">
+                                                Approve
+                                            </a>
+                                            <a class="action-btn reject-btn"
+                                               href="../actions/admin/update_reservation_status.php?id=<?php echo urlencode($request['reservation_id']); ?>&status=Rejected"
+                                               onclick="return confirm('Reject this reservation?');">
+                                                Reject
+                                            </a>
                                             <a class="action-btn delete-btn"
-                                               href="../actions/admin/admin_delete_reservation.php?id=<?php echo urlencode($row['reservation_id']); ?>"
-                                               onclick="return confirm('Delete this reservation permanently?');">
+                                               href="../actions/admin/admin_delete_reservation.php?id=<?php echo urlencode($request['reservation_id']); ?>"
+                                               onclick="return confirm('Delete this reservation?');">
                                                 Delete
                                             </a>
                                         </div>
@@ -423,6 +450,84 @@ function reservationStatusClass(string $status): string
                 </div>
             </section>
         </section>
+
+        <!-- STUDENT SUMMARY (analytics and overview) -->
+        <section id="panel-summary"
+                 class="admin-panel <?php echo $view === 'summary' ? 'active' : ''; ?>">
+            <header class="dashboard-header">
+                <div class="dashboard-title">
+                    <h1>Student Summary</h1>
+                    <p>Live analytics and reservation overview for all students.</p>
+                </div>
+            </header>
+
+            <section class="summary-cards cols-4">
+                <div class="summary-card">
+                    <span>Total Reservations</span>
+                    <strong id="summary-total-main"><?php echo $requestTotal; ?></strong>
+                </div>
+                <div class="summary-card">
+                    <span>Pending Requests</span>
+                    <strong id="summary-pending-main"><?php echo $pending; ?></strong>
+                </div>
+                <div class="summary-card">
+                    <span>Approved Requests</span>
+                    <strong id="summary-approved-main"><?php echo $approved; ?></strong>
+                </div>
+                <div class="summary-card">
+                    <span>Rejected Requests</span>
+                    <strong id="summary-rejected-main"><?php echo $rejected; ?></strong>
+                </div>
+            </section>
+
+            <section class="table-card analytics-card" aria-label="Reservation Analytics">
+                <div class="table-header">
+                    <h2>Reservation Analytics</h2>
+                    <p>Detailed breakdown of all reservations and student violations.</p>
+                </div>
+
+                <div class="analytics-content">
+                    <div class="analytics-panel">
+                        <h3>Status Distribution</h3>
+                        <div class="distribution-row">
+                            <span>Approved</span>
+                            <strong id="summary-approved-percent-main"><?php echo $approvedPercent; ?>%</strong>
+                        </div>
+                        <div class="distribution-bar-bg">
+                            <div id="bar-approved-main" class="distribution-bar approved"
+                                 style="width: <?php echo $approvedPercent; ?>%;"></div>
+                        </div>
+
+                        <div class="distribution-row">
+                            <span>Pending</span>
+                            <strong id="summary-pending-percent-main"><?php echo $pendingPercent; ?>%</strong>
+                        </div>
+                        <div class="distribution-bar-bg">
+                            <div id="bar-pending-main" class="distribution-bar pending"
+                                 style="width: <?php echo $pendingPercent; ?>%;"></div>
+                        </div>
+
+                        <div class="distribution-row">
+                            <span>Rejected</span>
+                            <strong id="summary-rejected-percent-main"><?php echo $rejectedPercent; ?>%</strong>
+                        </div>
+                        <div class="distribution-bar-bg">
+                            <div id="bar-rejected-main" class="distribution-bar rejected"
+                                 style="width: <?php echo $rejectedPercent; ?>%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-panel violations-panel">
+                        <h3>Violation Overview</h3>
+                        <div class="violations-stat">
+                            <span class="violations-count" id="summary-violations-main"><?php echo $violationStudents; ?></span>
+                            <span class="violations-label">Students with recorded violations</span>
+                        </div>
+                        <p class="violations-note">This number updates automatically as reservation data changes.</p>
+                    </div>
+                </div>
+            </section>
+        </section>
     </main>
 </div>
 
@@ -447,6 +552,53 @@ document.querySelectorAll('.sidebar-link[data-panel]').forEach((link) => {
         link.classList.add('active');
     });
 });
+
+function updateAllSummaryViews(data) {
+    // Update Student Summary panel
+    document.getElementById('summary-total-main').textContent = data.total;
+    document.getElementById('summary-pending-main').textContent = data.pending;
+    document.getElementById('summary-approved-main').textContent = data.approved;
+    document.getElementById('summary-rejected-main').textContent = data.rejected;
+    document.getElementById('summary-violations-main').textContent = data.violations;
+
+    document.getElementById('summary-approved-percent-main').textContent = data.approvedPercent + '%';
+    document.getElementById('summary-pending-percent-main').textContent = data.pendingPercent + '%';
+    document.getElementById('summary-rejected-percent-main').textContent = data.rejectedPercent + '%';
+
+    document.getElementById('bar-approved-main').style.width = data.approvedPercent + '%';
+    document.getElementById('bar-pending-main').style.width = data.pendingPercent + '%';
+    document.getElementById('bar-rejected-main').style.width = data.rejectedPercent + '%';
+
+    // Update Student Request panel summary
+    if (document.getElementById('summary-total')) {
+        document.getElementById('summary-total').textContent = data.total;
+        document.getElementById('summary-pending').textContent = data.pending;
+        document.getElementById('summary-approved').textContent = data.approved;
+        document.getElementById('summary-rejected').textContent = data.rejected;
+        document.getElementById('summary-violations').textContent = data.violations;
+
+        document.getElementById('summary-approved-percent').textContent = data.approvedPercent + '%';
+        document.getElementById('summary-pending-percent').textContent = data.pendingPercent + '%';
+        document.getElementById('summary-rejected-percent').textContent = data.rejectedPercent + '%';
+
+        document.getElementById('bar-approved').style.width = data.approvedPercent + '%';
+        document.getElementById('bar-pending').style.width = data.pendingPercent + '%';
+        document.getElementById('bar-rejected').style.width = data.rejectedPercent + '%';
+    }
+}
+
+function fetchSummaryData() {
+    fetch('?summary_data=1')
+        .then((response) => response.json())
+        .then((data) => updateAllSummaryViews(data))
+        .catch((error) => console.error('Summary fetch failed:', error));
+}
+
+// Fetch summary data on page load and refresh every 10 seconds
+if (document.getElementById('summary-total-main')) {
+    fetchSummaryData();
+    setInterval(fetchSummaryData, 10000);
+}
 </script>
 
 </body>
