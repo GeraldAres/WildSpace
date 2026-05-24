@@ -106,6 +106,7 @@ $requestsSql = "SELECT
         r.status,
         r.reservation_date,
         r.capacity,
+        r.space_type,
         r.date_created,
         s.user_id,
         u.firstname,
@@ -375,8 +376,8 @@ function reservationStatusClass(string $status): string
                             <tr>
                                 <th>Reservation ID</th>
                                 <th>Student Name</th>
-                                <th>Email</th>
                                 <th>Booking Date</th>
+                                <th>Study Space Type</th>
                                 <th>Capacity</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -398,8 +399,8 @@ function reservationStatusClass(string $status): string
                                         </div>
                                         <div class="muted">User ID: <?php echo htmlspecialchars($request['user_id']); ?></div>
                                     </td>
-                                    <td class="email-text"><?php echo htmlspecialchars($request['email']); ?></td>
                                     <td><?php echo formatReadableDate($request['reservation_date']); ?></td>
+                                    <td><?php echo htmlspecialchars($request['space_type'] ?? 'Not specified'); ?></td>
                                     <td><?php echo htmlspecialchars($request['capacity']); ?> people</td>
                                     <td>
                                         <span class="<?php echo reservationStatusClass($request['status']); ?>">
