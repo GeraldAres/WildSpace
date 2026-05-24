@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin_id'])) {
 }
 
 $view = $_GET['view'] ?? 'students';
-if (!in_array($view, ['students', 'requests', 'summary'], true)) {
+if (!in_array($view, ['students', 'requests', 'file_violation', 'violation_form', 'summary'], true)) {
     $view = 'students';
 }
 
@@ -155,6 +155,36 @@ while ($row = pg_fetch_assoc($requestsResult)) {
     $requests[] = $row;
 }
 
+/* ================= APPROVED RESERVATIONS FOR VIOLATIONS ================= */
+$approvedReservationsSql = "SELECT
+        r.reservation_id,
+        r.student_id,
+        r.reservation_date,
+        r.capacity,
+        r.space_type,
+        u.firstname,
+        u.lastname
+    FROM tblreservation r
+    INNER JOIN tblstudent s ON r.student_id = s.student_id
+    INNER JOIN tbluser u ON s.user_id = u.user_id
+    LEFT JOIN tblviolation v ON r.reservation_id = v.reservation_id
+    WHERE r.status = 'Approved'
+    AND v.violation_id IS NULL
+    ORDER BY r.reservation_date DESC";
+
+$approvedReservationsResult = pg_query($conn, $approvedReservationsSql);
+
+if (!$approvedReservationsResult) {
+    die('Approved reservations query failed: ' . pg_last_error($conn));
+}
+
+$approvedReservations = [];
+
+while ($row = pg_fetch_assoc($approvedReservationsResult)) {
+    $approvedReservations[] = $row;
+}
+
+
 function formatReadableDate(?string $date): string
 {
     if (empty($date)) {
@@ -211,6 +241,12 @@ function reservationStatusClass(string $status): string
                data-panel="requests">
                 <i class="fas fa-calendar-check"></i>
                 Student Request
+            </a>
+            <a href="?view=file_violation"
+            class="sidebar-link <?php echo $view === 'file_violation' || $view === 'violation_form' ? 'active' : ''; ?>"
+            data-panel="file_violation">
+                <i class="fas fa-triangle-exclamation"></i>
+                File a Violation
             </a>
 
             <a href="?view=summary"
@@ -451,6 +487,150 @@ function reservationStatusClass(string $status): string
                 </div>
             </section>
         </section>
+
+        <section id="panel-file_violation"
+         class="admin-panel <?php echo $view === 'file_violation' ? 'active' : ''; ?>">
+    <header class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>File a Violation</h1>
+            <p>Select an approved reservation and file a violation record.</p>
+        </div>
+    </header>
+
+    <section class="table-card">
+        <div class="table-header">
+            <h2>Approved Reservations</h2>
+            <p>Only approved reservations without existing violations are shown.</p>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reservation ID</th>
+                        <th>Student Name</th>
+                        <th>Study Space Type</th>
+                        <th>Booking Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <?php if (count($approvedReservations) === 0) { ?>
+                        <tr>
+                            <td colspan="5" class="muted">No approved reservations available for violation filing.</td>
+                        </tr>
+                    <?php } ?>
+
+                    <?php foreach ($approvedReservations as $reservation) { ?>
+                        <tr>
+                            <td>#<?php echo htmlspecialchars($reservation['reservation_id']); ?></td>
+                            <td><?php echo htmlspecialchars(trim($reservation['firstname'] . ' ' . $reservation['lastname'])); ?></td>
+                            <td><?php echo htmlspecialchars($reservation['space_type'] ?? 'Not specified'); ?></td>
+                            <td><?php echo formatReadableDate($reservation['reservation_date']); ?></td>
+                            <td>
+                                <a class="action-btn reject-btn"
+                                   href="?view=violation_form&id=<?php echo urlencode($reservation['reservation_id']); ?>">
+                                    File Violation
+                                </a>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+
+<?php if ($view === 'violation_form' && isset($_GET['id'])) { ?>
+<section id="panel-violation_form" class="admin-panel active">
+
+    <header class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>Violation Form</h1>
+            <p>Record student violations related to approved reservations.</p>
+        </div>
+    </header>
+
+    <div class="violation-form-card">
+
+        <div class="violation-form-header">
+            <h2>File Student Violation</h2>
+            <p>
+                Complete the form below to document violations committed during the reservation period.
+            </p>
+        </div>
+
+        <form method="POST"
+              action="../actions/admin/file_violation.php"
+              class="violation-form-body">
+
+            <input type="hidden"
+                   name="reservation_id"
+                   value="<?php echo htmlspecialchars($_GET['id']); ?>">
+
+            <div class="violation-info-grid">
+
+                <div class="violation-info-box">
+                    <span>Reservation ID</span>
+                    <strong>
+                        #<?php echo htmlspecialchars($_GET['id']); ?>
+                    </strong>
+                </div>
+
+                <div class="violation-info-box">
+                    <span>Status</span>
+                    <strong>Approved Reservation</strong>
+                </div>
+
+            </div>
+
+            <div class="violation-field">
+                <label>Violation Type</label>
+
+                <select name="violation_type" required>
+                    <option value="" disabled selected>
+                        Select violation type
+                    </option>
+
+                    <option value="Noise Complaint">
+                        Noise Complaint
+                    </option>
+
+                    <option value="Misuse of Study Space">
+                        Misuse of Study Space
+                    </option>
+
+                    <option value="Damage to Property">
+                        Damage to Property
+                    </option>
+
+                    <option value="Leaving Area Unclean">
+                        Leaving Area Unclean
+                    </option>
+                </select>
+            </div>
+
+            <div class="violation-field">
+                <label>Description</label>
+
+                <textarea
+                    name="description"
+                    placeholder="Provide a detailed explanation of the violation..."
+                    required></textarea>
+            </div>
+
+            <button type="submit"
+                    name="file_violation"
+                    class="violation-submit">
+                Submit Violation Report
+            </button>
+
+        </form>
+    </div>
+</section>
+<?php } ?>
+
 
         <!-- STUDENT SUMMARY (analytics and overview) -->
         <section id="panel-summary"
