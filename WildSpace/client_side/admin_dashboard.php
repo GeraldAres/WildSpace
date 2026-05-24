@@ -58,6 +58,34 @@ while ($row = pg_fetch_assoc($studentsResult)) {
 }
 
 /* ================= RESERVATION REQUESTS ================= */
+$requestsPerPage = 10;
+$requestPage = isset($_GET['request_page']) && is_numeric($_GET['request_page']) && (int)$_GET['request_page'] > 0
+    ? (int)$_GET['request_page']
+    : 1;
+
+$requestCountSql = "SELECT
+        COUNT(*) AS total_requests,
+        SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) AS pending_requests,
+        SUM(CASE WHEN status = 'Approved' THEN 1 ELSE 0 END) AS approved_requests,
+        SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) AS rejected_requests
+    FROM tblreservation";
+$requestCountResult = pg_query($conn, $requestCountSql);
+
+if (!$requestCountResult) {
+    die('Query failed: ' . pg_last_error($conn));
+}
+
+$requestCountRow = pg_fetch_assoc($requestCountResult);
+$requestTotal = (int)($requestCountRow['total_requests'] ?? 0);
+$pending = (int)($requestCountRow['pending_requests'] ?? 0);
+$approved = (int)($requestCountRow['approved_requests'] ?? 0);
+$rejected = (int)($requestCountRow['rejected_requests'] ?? 0);
+$total = $requestTotal;
+
+$requestPageCount = max(1, (int)ceil($requestTotal / $requestsPerPage));
+$requestPage = min($requestPage, $requestPageCount);
+$requestOffset = ($requestPage - 1) * $requestsPerPage;
+
 $requestsSql = "SELECT
         r.reservation_id,
         r.student_id,
@@ -76,7 +104,8 @@ $requestsSql = "SELECT
     INNER JOIN tblstudent s ON r.student_id = s.student_id
     INNER JOIN tbluser u ON s.user_id = u.user_id
     LEFT JOIN tblviolation v ON r.reservation_id = v.reservation_id
-    ORDER BY r.date_created DESC";
+    ORDER BY r.date_created DESC
+    LIMIT $requestsPerPage OFFSET $requestOffset";
 
 $requestsResult = pg_query($conn, $requestsSql);
 
@@ -85,22 +114,9 @@ if (!$requestsResult) {
 }
 
 $requests = [];
-$total = 0;
-$pending = 0;
-$approved = 0;
-$rejected = 0;
 
 while ($row = pg_fetch_assoc($requestsResult)) {
     $requests[] = $row;
-    $total++;
-
-    if ($row['status'] === 'Pending') {
-        $pending++;
-    } elseif ($row['status'] === 'Approved') {
-        $approved++;
-    } elseif ($row['status'] === 'Rejected') {
-        $rejected++;
-    }
 }
 
 function formatReadableDate(?string $date): string
@@ -386,6 +402,24 @@ function reservationStatusClass(string $status): string
                             <?php } ?>
                         </tbody>
                     </table>
+                </div>
+
+                <div class="pagination-controls">
+                    <a class="pagination-btn<?php echo $requestPage <= 1 ? ' disabled' : ''; ?>"
+                       href="?view=requests&request_page=<?php echo max(1, $requestPage - 1); ?>"
+                       <?php if ($requestPage <= 1) echo 'aria-disabled="true" tabindex="-1"'; ?>>
+                        &laquo; Previous
+                    </a>
+
+                    <span class="pagination-info">
+                        Page <?php echo $requestPage; ?> of <?php echo $requestPageCount; ?>
+                    </span>
+
+                    <a class="pagination-btn<?php echo $requestPage >= $requestPageCount ? ' disabled' : ''; ?>"
+                       href="?view=requests&request_page=<?php echo min($requestPageCount, $requestPage + 1); ?>"
+                       <?php if ($requestPage >= $requestPageCount) echo 'aria-disabled="true" tabindex="-1"'; ?>>
+                        Next &raquo;
+                    </a>
                 </div>
             </section>
         </section>
