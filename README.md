@@ -18,7 +18,7 @@ WildSpace is a robust PHP-based study space reservation system designed to simpl
 
 ## 👥 Project Proponents
 <p align="center">
-  <img src="assets/images/developers.png" alt="The Developers" width="750">
+  <img src="developers.png" alt="The Developers" width="750">
 </p>
 
 <p align="center">
