@@ -78,11 +78,10 @@ if ($isLoggedIn) {
         <aside class="hero-right" aria-labelledby="hero-right-heading">
             <div class="feature-card" style="margin-bottom:1rem;">
                 <h3 id="hero-right-heading" style="margin-bottom:0.5rem;">Quick Actions</h3>
-                <p style="color:var(--text-muted);margin-bottom:1rem;">Sign in or make a reservation in seconds.</p>
+                <p style="color:var(--text-muted);margin-bottom:1rem;">Sign in or Register.</p>
                 <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
                     <button class="cta-button" onclick="location.href='login.php'">Log In</button>
                     <button class="cta-button" onclick="location.href='register.php'">Register</button>
-                    <a class="secondary-link" href="book.php">Book Now</a>
                 </div>
             </div>
 
