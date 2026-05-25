@@ -1,3 +1,16 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['user_id'], $_SESSION['role']);
+$profileName = '';
+$profileInitial = 'P';
+if ($isLoggedIn) {
+    $profileName = trim(($_SESSION['firstname'] ?? '') . ' ' . ($_SESSION['lastname'] ?? ''));
+    if ($profileName === '') {
+        $profileName = $_SESSION['email'] ?? 'Profile';
+    }
+    $profileInitial = strtoupper(substr($profileName, 0, 1));
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,8 +32,32 @@
                 <h1 class="logo-text">WildSpace</h1>
             </div>
             <div class="nav-right">
-                <a href="book.php" class="nav-link">Reservation</a>
-                <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
+                <div class="nav-actions">
+                    <a href="community.php" class="nav-link">Community</a>
+                    <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
+                </div>
+
+                <div class="account-area">
+                    <div class="profile-dropdown">
+                        <button type="button" class="profile-button">
+                            <span class="profile-avatar">
+                                <?php if ($isLoggedIn) { echo htmlspecialchars($profileInitial); } else { ?>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path fill-rule="evenodd" d="M8 9a5 5 0 0 0-5 5v.5A.5.5 0 0 0 3.5 15h9a.5.5 0 0 0 .5-.5V14a5 5 0 0 0-5-5z"/></svg>
+                                <?php } ?>
+                            </span>
+                            <span class="profile-name"><?php echo htmlspecialchars($profileName); ?></span>
+                        </button>
+                        <div class="profile-menu">
+                            <?php if ($isLoggedIn) { ?>
+                                <a href="student_dashboard.php">Dashboard</a>
+                                <a href="../actions/logout.php">Log Out</a>
+                            <?php } else { ?>
+                                <a href="login.php">Log In</a>
+                                <a href="register.php">Register</a>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -112,5 +149,6 @@
     </footer>
 
     <script src="../assets/js/index.js"></script>
+    <script src="../assets/js/script.js"></script>
 </body>
 </html>

@@ -538,6 +538,43 @@ function reservationStatusClass(string $status): string
                     </div>
                 </div>
             </section>
+
+            <?php
+            $spaceTrackerMaxCount = 0;
+            foreach ($spaceTracker as $trackerStats) {
+                if ($trackerStats['people_count'] > $spaceTrackerMaxCount) {
+                    $spaceTrackerMaxCount = $trackerStats['people_count'];
+                }
+            }
+            if ($spaceTrackerMaxCount === 0) {
+                $spaceTrackerMaxCount = 1;
+            }
+            ?>
+
+            <section class="table-card analytics-card tracker-card" aria-label="Live Space Tracker">
+                <div class="table-header">
+                    <h2>Live Space Tracker</h2>
+                    <p>Non-editable booking usage graph for each study space type.</p>
+                </div>
+
+                <div class="tracker-chart">
+                    <?php foreach ($spaceTracker as $type => $stats) {
+                        $width = (int) round(($stats['people_count'] / $spaceTrackerMaxCount) * 100);
+                        $safeId = 'tracker-bar-' . strtolower(str_replace([' ', '/'], '-', $type));
+                    ?>
+                        <div class="tracker-bar-row">
+                            <span class="tracker-label"><?php echo htmlspecialchars($type); ?></span>
+                            <div class="tracker-bar-bg">
+                                <div id="<?php echo $safeId; ?>" class="tracker-bar <?php echo htmlspecialchars(str_replace(' ', '-', strtolower($type))); ?>" style="width: <?php echo $width; ?>%;"></div>
+                            </div>
+                            <div class="tracker-meta">
+                                <span class="tracker-value"><?php echo htmlspecialchars($stats['people_count']); ?> people</span>
+                                <span><?php echo htmlspecialchars($stats['reservation_count']); ?> reservations</span>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+            </section>
         </section>
     </main>
 </div>
@@ -579,6 +616,30 @@ function updateAllSummaryViews(data) {
     document.getElementById('bar-approved-main').style.width = data.approvedPercent + '%';
     document.getElementById('bar-pending-main').style.width = data.pendingPercent + '%';
     document.getElementById('bar-rejected-main').style.width = data.rejectedPercent + '%';
+
+    if (data.spaceTracker && typeof data.spaceTracker === 'object') {
+        const trackerEntries = Object.entries(data.spaceTracker);
+        const maxCount = Math.max(...trackerEntries.map(([, stat]) => stat.people_count || 0), 1);
+
+        trackerEntries.forEach(([type, stat]) => {
+            const safeId = 'tracker-bar-' + type.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+            const bar = document.getElementById(safeId);
+            if (!bar) return;
+
+            bar.style.width = Math.round(((stat.people_count || 0) / maxCount) * 100) + '%';
+            const row = bar.closest('.tracker-bar-row');
+            if (row) {
+                const countLabel = row.querySelector('.tracker-value');
+                const metaLabel = row.querySelector('.tracker-meta');
+                if (countLabel) {
+                    countLabel.textContent = `${stat.people_count || 0} people`;
+                }
+                if (metaLabel) {
+                    metaLabel.querySelector('span:last-child').textContent = `${stat.reservation_count || 0} reservations`;
+                }
+            }
+        });
+    }
 
     // Update Student Request panel summary
     if (document.getElementById('summary-total')) {

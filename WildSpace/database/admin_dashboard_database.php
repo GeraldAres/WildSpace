@@ -82,6 +82,42 @@ if (!$violationCountResult) {
 $violationCountRow = pg_fetch_assoc($violationCountResult);
 $violationStudents = (int)($violationCountRow['admin_violations'] ?? 0);
 
+/* LIVE SPACE TRACKER DATA */
+$spaceTracker = [
+    'Solo Table' => ['reservation_count' => 0, 'people_count' => 0, 'approved_count' => 0, 'pending_count' => 0],
+    'Quiet Room' => ['reservation_count' => 0, 'people_count' => 0, 'approved_count' => 0, 'pending_count' => 0],
+    'Group Table' => ['reservation_count' => 0, 'people_count' => 0, 'approved_count' => 0, 'pending_count' => 0],
+    'Discussion Room' => ['reservation_count' => 0, 'people_count' => 0, 'approved_count' => 0, 'pending_count' => 0],
+];
+
+$spaceTrackerSql = "SELECT
+        r.space_type,
+        COUNT(*) AS reservation_count,
+        COALESCE(SUM(r.capacity), 0) AS people_count,
+        SUM(CASE WHEN r.status = 'Approved' THEN 1 ELSE 0 END) AS approved_count,
+        SUM(CASE WHEN r.status = 'Pending' THEN 1 ELSE 0 END) AS pending_count
+    FROM tblreservation r
+    WHERE r.reservation_date >= CURRENT_DATE
+      AND r.status IN ('Approved', 'Pending')
+    GROUP BY r.space_type
+    ORDER BY r.space_type";
+
+$spaceTrackerResult = pg_query($conn, $spaceTrackerSql);
+
+if ($spaceTrackerResult) {
+    while ($row = pg_fetch_assoc($spaceTrackerResult)) {
+        $spaceType = $row['space_type'] ?? null;
+        if ($spaceType && array_key_exists($spaceType, $spaceTracker)) {
+            $spaceTracker[$spaceType] = [
+                'reservation_count' => (int)$row['reservation_count'],
+                'people_count' => (int)$row['people_count'],
+                'approved_count' => (int)$row['approved_count'],
+                'pending_count' => (int)$row['pending_count'],
+            ];
+        }
+    }
+}
+
 $requestPageCount = max(1, (int)ceil($requestTotal / $requestsPerPage));
 $requestPage = min($requestPage, $requestPageCount);
 $requestOffset = ($requestPage - 1) * $requestsPerPage;
@@ -122,6 +158,7 @@ $summaryData = [
     'approvedPercent' => $approvedPercent,
     'pendingPercent' => $pendingPercent,
     'rejectedPercent' => $rejectedPercent,
+    'spaceTracker' => $spaceTracker,
 ];
 
 if (isset($_GET['summary_data'])) {

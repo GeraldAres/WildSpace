@@ -1,3 +1,16 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['user_id'], $_SESSION['role']);
+$profileName = '';
+$profileInitial = 'P';
+if ($isLoggedIn) {
+    $profileName = trim(($_SESSION['firstname'] ?? '') . ' ' . ($_SESSION['lastname'] ?? ''));
+    if ($profileName === '') {
+        $profileName = $_SESSION['email'] ?? 'Profile';
+    }
+    $profileInitial = strtoupper(substr($profileName, 0, 1));
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,8 +32,33 @@
                 <h1 class="logo-text">WildSpace</h1>
             </div>
             <div class="nav-right">
-                <a href="book.php" class="nav-link">Reservation</a>
+                <a href="community.php" class="nav-link">Community</a>
                 <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
+                    <div class="nav-actions">
+                        <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
+                    </div>
+
+                    <div class="account-area">
+                        <div class="profile-dropdown">
+                            <button type="button" class="profile-button">
+                                <span class="profile-avatar">
+                                    <?php if ($isLoggedIn) { echo htmlspecialchars($profileInitial); } else { ?>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path fill-rule="evenodd" d="M8 9a5 5 0 0 0-5 5v.5A.5.5 0 0 0 3.5 15h9a.5.5 0 0 0 .5-.5V14a5 5 0 0 0-5-5z"/></svg>
+                                    <?php } ?>
+                                </span>
+                                <span class="profile-name"><?php echo htmlspecialchars($profileName); ?></span>
+                            </button>
+                            <div class="profile-menu">
+                                <?php if ($isLoggedIn) { ?>
+                                    <a href="student_dashboard.php">Dashboard</a>
+                                    <a href="../actions/logout.php">Log Out</a>
+                                <?php } else { ?>
+                                    <a href="login.php">Log In</a>
+                                    <a href="register.php">Register</a>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
     </nav>
@@ -33,7 +71,7 @@
             <p class="hero-subtitle">Reserve CIT‑U study spots, group rooms, and quiet areas—all in one place.</p>
 
             <div class="hero-actions" style="justify-content:center;margin-top:1.25rem;">
-                <button class="cta-button cta-primary" onclick="location.href='book.php'">Get Started</button>
+                <button class="cta-button cta-primary" onclick="location.href='community.php'">Join the Community</button>
                 <a class="secondary-link" href="landingPage.php#features">Platform features</a>
             </div>
 
@@ -61,11 +99,11 @@
     <!-- Page 2 Section -->
     <section class="page2">
         <div class="page2-left">
-            <h2 class="page2-title">Book <span class="bold-word">Smart.</span> Study <span class="bold-word">Better.</span></h2>
+            <h2 class="page2-title">Discuss <span class="bold-word">Smart.</span> Study <span class="bold-word">Better.</span></h2>
             <p class="page2-description">
-                Easily locate and reserve study spaces across CIT-U with a streamlined system designed to reduce conflicts, save time, and improve collaboration.
+                Join the campus community, share study space feedback, and rate the rooms you booked before posting.
             </p>
-            <button class="cta-button page2-cta" onclick="location.href='book.php'">Book Now</button>
+            <button class="cta-button page2-cta" onclick="location.href='community.php'">Go to Community</button>
         </div>
 
         <div class="page2-right">
@@ -78,7 +116,7 @@
                     <div style="background:rgba(255,255,255,0.03);padding:0.6rem;border-radius:10px;">Open Desk · 6 left</div>
                     <div style="background:rgba(255,255,255,0.03);padding:0.6rem;border-radius:10px;">AV Room · 0 left</div>
                 </div>
-                <a class="secondary-link" href="book.php" style="margin-top:0.75rem;">See all spaces</a>
+                <a class="secondary-link" href="community.php" style="margin-top:0.75rem;">Join the community feed</a>
             </div>
         </div>
     </section>
@@ -90,7 +128,7 @@
                  <h1 class="logo-text">WildSpace</h1>
             </div>
             <p class="section3-description">
-                A centralized platform for CIT-U students to check availability, reserve tables, and manage study spaces in real time—so you spend less time searching and more time learning.
+                A centralized platform for CIT-U students to review booked spaces, exchange study tips, and manage study spaces in real time—so you study smarter together.
             </p>
         </div>
     </section>
@@ -101,19 +139,16 @@
             <div class="section5-header">
                 <p class="section5-branding">WildSpace</p>
                 <h2 class="section5-main-title"><span class="section5-bold">Platform</span>Features</h2>
-                <p class="section5-subtitle">Book Your Space in Seconds</p>
-            </div>
-
-            <div class="section5-content">
+                    <p class="section5-subtitle">Connect, rate, and discuss study spaces with your peers</p>
                 <div class="platform-features">
                     <div class="feature-item">
-                        <button class="feature-button">Book a Space</button>
-                        <p class="feature-text">Reserve tables in seconds without the hassle of walking around campus.</p>
+                        <button class="feature-button" onclick="location.href='community.php'">Community Feed</button>
+                        <p class="feature-text">Share your take on booked study spaces and discover helpful peer feedback.</p>
                     </div>
 
                     <div class="feature-item">
-                        <button class="feature-button">Book by Group</button>
-                        <p class="feature-text">Request larger areas for meetings, discussions, and team collaboration.</p>
+                        <button class="feature-button" onclick="location.href='community.php'">Study Group Chat</button>
+                        <p class="feature-text">Ask questions, discuss room preferences, and exchange study tips.</p>
                     </div>
 
                     <div class="feature-item">
