@@ -11,3 +11,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}
+
+function openDeletePopup() {
+    document.getElementById("deleteConfirmPopup").classList.add("active");
+}
+
+function closeDeletePopup() {
+    document.getElementById("deleteConfirmPopup").classList.remove("active");
+}
+
+function submitDeleteAccount() {
+    document.getElementById("deleteAccountForm").submit();
+}

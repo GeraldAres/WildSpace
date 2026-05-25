@@ -217,3 +217,11 @@ const observer = new IntersectionObserver((entries) => {
 });
 
 document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}

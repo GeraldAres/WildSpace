@@ -1,5 +1,15 @@
 <?php
 session_start();
+
+if (isset($_SESSION['login_success'])) {
+    $_SESSION['popup_success'] = $_SESSION['login_success'];
+    unset($_SESSION['login_success']);
+}
+
+if (isset($_SESSION['login_error'])) {
+    $_SESSION['popup_error'] = $_SESSION['login_error'];
+    unset($_SESSION['login_error']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,8 +19,10 @@ session_start();
     <title>WildSpace - Log In</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/auth.css">
+    <link rel="stylesheet" href="../assets/css/popup.css">
 </head>
 <body>
+    <?php include __DIR__ . '/popup.php'; ?>
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
@@ -38,24 +50,6 @@ session_start();
 
             <form class="auth-form" id="loginForm" action="../actions/login_action.php" method="POST">
 
-                <?php if (isset($_SESSION['login_success'])) { ?>
-                    <div class="auth-message auth-message--success" id="loginMessage">
-                        <?php 
-                            echo htmlspecialchars($_SESSION['login_success']); 
-                            unset($_SESSION['login_success']);
-                        ?>
-                    </div>
-                <?php } ?>
-
-                <?php if (isset($_SESSION['login_error'])) { ?>
-                    <div class="auth-message auth-message--error" id="loginMessage">
-                        <?php 
-                            echo htmlspecialchars($_SESSION['login_error']); 
-                            unset($_SESSION['login_error']);
-                        ?>
-                    </div>
-                <?php } ?>
-
                 <div class="form-group">
                     <input type="email" name="email" id="email" class="form-input" placeholder="Educational Email:" required>
                 </div>
@@ -82,15 +76,6 @@ session_start();
             </div>
         </div>
     </main>
-
-    <script>
-        setTimeout(() => {
-            const message = document.getElementById("loginMessage");
-            if (message) {
-                message.style.display = "none";
-            }
-        }, 3000);
-    </script>
 
     <script src="../assets/js/auth.js"></script>
 </body>

@@ -8,9 +8,10 @@ session_start();
     <meta charset="UTF-8">
     <title>WildSpace - Register</title>
     <link rel="stylesheet" href="../assets/css/pickUser.css">
+    <link rel="stylesheet" href="../assets/css/popup.css">
 </head>
 <body>
-
+<?php include __DIR__ . '/popup.php'; ?>
 <div class="container">
 
     <div class="card">

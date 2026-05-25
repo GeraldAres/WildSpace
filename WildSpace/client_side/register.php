@@ -7,10 +7,11 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/auth.css">
+    <link rel="stylesheet" href="../assets/css/popup.css">
 </head>
 
 <body>
-
+<?php include __DIR__ . '/popup.php'; ?>
 <!-- ================= NAVBAR ================= -->
 <nav class="navbar">
     <div class="nav-container">
@@ -117,20 +118,16 @@
             </div>
 
             <!-- GENDER -->
-            <div class="form-group">
+            <div class="form-group select-wrapper">
                 <select name="gender" class="form-input" required>
-                    <option value="" disabled selected>
-                        Gender:
-                    </option>
-
+                    <option value="" disabled selected>Gender:</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
-                    <option value="Prefer not to say">
-                        Prefer not to say
-                    </option>
+                    <option value="Prefer not to say">Prefer not to say</option>
                 </select>
-            </div>
 
+                <i class="fas fa-chevron-down select-icon"></i>
+            </div>
             <!-- MOBILE -->
             <div class="form-group">
                 <input

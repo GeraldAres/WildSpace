@@ -365,3 +365,93 @@ select.form-input option {
     background-color: #1a2233 !important;
     color: #eef2ff !important;
 }
+
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    z-index: 99999;
+}
+
+.confirm-overlay.active {
+    display: flex;
+}
+
+.confirm-card {
+    position: relative;
+    width: 420px;
+    max-width: 90%;
+    background: #ffffff;
+    color: #111111;
+    border-radius: 24px;
+    padding: 42px 36px 32px;
+    text-align: center;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+}
+
+.confirm-x {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    cursor: pointer;
+    color: #111111;
+}
+
+.confirm-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    background: rgba(212, 163, 28, 0.15);
+    color: #d4a31c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+}
+
+.confirm-delete {
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 44px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.confirm-cancel {
+    background: transparent;
+    color: #444;
+    border: none;
+    padding: 14px 30px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.confirm-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    background: rgba(212, 163, 28, 0.15);
+    color: #d4a31c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    font-weight: 800;
+}

@@ -30,11 +30,15 @@ if (!$role_id) {
 
 include '../database/edit_profile_database.php';
 
-$success = $_SESSION['profile_success'] ?? '';
-$error = $_SESSION['profile_error'] ?? '';
+if (isset($_SESSION['profile_success'])) {
+    $_SESSION['popup_success'] = $_SESSION['profile_success'];
+    unset($_SESSION['profile_success']);
+}
 
-unset($_SESSION['profile_success']);
-unset($_SESSION['profile_error']);
+if (isset($_SESSION['profile_error'])) {
+    $_SESSION['popup_error'] = $_SESSION['profile_error'];
+    unset($_SESSION['profile_error']);
+}
 ?>
 
 <!DOCTYPE html>
@@ -43,11 +47,11 @@ unset($_SESSION['profile_error']);
     <meta charset="UTF-8">
     <title>WildSpace - Edit Profile</title>
     <link rel="stylesheet" href="../assets/css/edit-profile.css">
-
-
+    <link rel="stylesheet" href="../assets/css/popup.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
-
+<?php include __DIR__ . '/popup.php'; ?>
 <nav class="navbar">
     <a href="<?php echo htmlspecialchars($dashboard); ?>" class="nav-link">Back to Dashboard</a>
     <div class="logo-text">WildSpace</div>
@@ -58,11 +62,6 @@ unset($_SESSION['profile_error']);
     <h1>Edit Profile</h1>
     <p class="subtitle">Update your <?php echo strtolower($roleLabel); ?> account information.</p>
 
-
-
-    <?php if (!empty($error)) { ?>
-        <div class="message error"><?php echo htmlspecialchars($error); ?></div>
-    <?php } ?>
 
     <div class="form-card">
         <div class="account-info">
@@ -130,20 +129,52 @@ unset($_SESSION['profile_error']);
 </form>
 
 <?php if ($role === 'student') { ?>
-    <form action="../actions/student/delete_account.php"
+<form action="../actions/student/delete_account.php"
       method="POST"
       id="deleteAccountForm">
 
-        <div class="delete-action-row">
-            <button type="submit" name="delete_account" class="delete-account-btn">
-                Delete Account
-            </button>
-        </div>
-    </form>
+    <input type="hidden" name="delete_account" value="1">
+
+    <div class="delete-action-row">
+        <button type="button" class="delete-account-btn" onclick="openDeletePopup()">
+            Delete Account
+        </button>
+    </div>
+</form>
 <?php } ?>
 
     </div>
 </main>
 <script src="../assets/js/edit-profile.js"></script>
+
+<div class="confirm-overlay" id="deleteConfirmPopup">
+    <div class="confirm-card">
+        <button type="button" class="confirm-x" onclick="closeDeletePopup()">
+            &times;
+        </button>
+
+        <div class="confirm-icon">
+            <i class="fas fa-exclamation"></i>
+        </div>
+
+        <h2>Are you sure?</h2>
+
+        <p>
+            Are you sure you want to delete your account?
+            <br>
+            This action cannot be undone.
+        </p>
+
+        <div class="confirm-actions">
+            <button type="button" class="confirm-delete" onclick="submitDeleteAccount()">
+                Delete
+            </button>
+
+            <button type="button" class="confirm-cancel" onclick="closeDeletePopup()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
