@@ -86,3 +86,22 @@
     transform: translateY(-2px);
     box-shadow: 0 14px 24px rgba(250,204,21,0.22);
 }
+
+.confirm-card h2 {
+    margin: 0 0 14px;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.confirm-card p {
+    margin: 0 0 32px;
+    color: #555;
+    line-height: 1.6;
+}
+
+.confirm-actions {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+}

@@ -45,11 +45,11 @@ function reservationStatusClass(string $status): string
     <title>WildSpace - Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/admin-dashboard.css">
-
+    <link rel="stylesheet" href="../assets/css/popup.css">
     
 </head>
 <body>
-
+<?php include __DIR__ . '/popup.php'; ?>
 <div class="admin-layout">
     <aside class="admin-sidebar">
         <div class="sidebar-brand">
@@ -92,12 +92,12 @@ function reservationStatusClass(string $status): string
                 Edit Profile
             </a>
 
-            <a href="../actions/admin/logout.php"
-               class="sidebar-link logout-link"
-               onclick="return confirm('Are you sure you want to log out?');">
+            <button type="button"
+                    class="sidebar-link logout-link"
+                    onclick="openLogoutPopup()">
                 <i class="fas fa-right-from-bracket"></i>
                 Log Out
-            </a>
+            </button>
         </div>
     </aside>
 
@@ -166,11 +166,11 @@ function reservationStatusClass(string $status): string
                                     <td><?php echo htmlspecialchars($student['reservation_count']); ?></td>
                                     <td>
                                         <div class="actions">
-                                            <a class="action-btn delete-btn"
-                                               href="../actions/admin/admin_delete_student.php?id=<?php echo urlencode($student['student_id']); ?>"
-                                               onclick="return confirm('Delete this student and all of their reservations?');">
+                                            <button type="button"
+                                                    class="action-btn delete-btn"
+                                                    onclick="openDeleteStudentPopup('../actions/admin/admin_delete_student.php?id=<?php echo urlencode($student['student_id']); ?>')">
                                                 Delete
-                                            </a>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -274,21 +274,22 @@ function reservationStatusClass(string $status): string
                                     </td>
                                     <td>
                                         <div class="actions">
-                                            <a class="action-btn approve-btn"
-                                               href="../actions/admin/update_reservation_status.php?id=<?php echo urlencode($request['reservation_id']); ?>&status=Approved"
-                                               onclick="return confirm('Approve this reservation?');">
+                                            <button type="button"
+                                                    class="action-btn approve-btn"
+                                                    onclick="openStatusPopup('../actions/admin/update_reservation_status.php?id=<?php echo urlencode($request['reservation_id']); ?>&status=Approved', 'Approve this reservation?')">
                                                 Approve
-                                            </a>
-                                            <a class="action-btn reject-btn"
-                                               href="../actions/admin/update_reservation_status.php?id=<?php echo urlencode($request['reservation_id']); ?>&status=Rejected"
-                                               onclick="return confirm('Reject this reservation?');">
+                                            </button>
+
+                                            <button type="button"
+                                                    class="action-btn reject-btn"
+                                                    onclick="openStatusPopup('../actions/admin/update_reservation_status.php?id=<?php echo urlencode($request['reservation_id']); ?>&status=Rejected', 'Reject this reservation?')">
                                                 Reject
-                                            </a>
-                                            <a class="action-btn delete-btn"
-                                               href="../actions/admin/admin_delete_reservation.php?id=<?php echo urlencode($request['reservation_id']); ?>"
-                                               onclick="return confirm('Delete this reservation?');">
+                                            </button>
+                                            <button type="button"
+                                                    class="action-btn delete-btn"
+                                                    onclick="openDeleteReservationPopup('../actions/admin/admin_delete_reservation.php?id=<?php echo urlencode($request['reservation_id']); ?>')">
                                                 Delete
-                                            </a>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -610,6 +611,186 @@ if (document.getElementById('summary-total-main')) {
     setInterval(fetchSummaryData, 10000);
 }
 </script>
+<script>
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}
+let deleteStudentUrl = "";
 
+function openDeleteStudentPopup(url) {
+    deleteStudentUrl = url;
+    document.getElementById("deleteStudentPopup").classList.add("active");
+}
+
+function closeDeleteStudentPopup() {
+    document.getElementById("deleteStudentPopup").classList.remove("active");
+    deleteStudentUrl = "";
+}
+
+function confirmDeleteStudent() {
+    if (deleteStudentUrl !== "") {
+        window.location.href = deleteStudentUrl;
+    }
+}
+
+let deleteReservationUrl = "";
+
+function openDeleteReservationPopup(url) {
+    deleteReservationUrl = url;
+    document.getElementById("deleteReservationPopup").classList.add("active");
+}
+
+function closeDeleteReservationPopup() {
+    document.getElementById("deleteReservationPopup").classList.remove("active");
+    deleteReservationUrl = "";
+}
+
+function confirmDeleteReservation() {
+    if (deleteReservationUrl !== "") {
+        window.location.href = deleteReservationUrl;
+    }
+}
+let statusUrl = "";
+
+function openStatusPopup(url, message) {
+    statusUrl = url;
+    document.getElementById("statusPopupMessage").innerHTML = message + "<br>This action will update the reservation status.";
+    document.getElementById("statusConfirmPopup").classList.add("active");
+}
+
+function closeStatusPopup() {
+    document.getElementById("statusConfirmPopup").classList.remove("active");
+    statusUrl = "";
+}
+
+function confirmStatusUpdate() {
+    if (statusUrl !== "") {
+        window.location.href = statusUrl;
+    }
+}
+function openLogoutPopup() {
+    document.getElementById("logoutConfirmPopup").classList.add("active");
+}
+
+function closeLogoutPopup() {
+    document.getElementById("logoutConfirmPopup").classList.remove("active");
+}
+
+function confirmLogout() {
+    window.location.href = "../actions/admin/logout.php";
+}
+</script>
+<div class="confirm-overlay" id="deleteStudentPopup">
+    <div class="confirm-card">
+        <button type="button" class="confirm-x" onclick="closeDeleteStudentPopup()">
+            &times;
+        </button>
+
+        <div class="confirm-icon">
+            <i class="fas fa-exclamation"></i>
+        </div>
+
+        <h2>Are you sure?</h2>
+
+        <p>
+            Delete this student and all of their reservations?
+            <br>
+            This action cannot be undone.
+        </p>
+
+        <div class="confirm-actions">
+            <button type="button" class="confirm-delete" onclick="confirmDeleteStudent()">
+                Delete
+            </button>
+
+            <button type="button" class="confirm-cancel" onclick="closeDeleteStudentPopup()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+<div class="confirm-overlay" id="deleteReservationPopup">
+    <div class="confirm-card">
+        <button type="button" class="confirm-x" onclick="closeDeleteReservationPopup()">
+            &times;
+        </button>
+
+        <div class="confirm-icon">
+            <i class="fas fa-exclamation"></i>
+        </div>
+
+        <h2>Are you sure?</h2>
+
+        <p>
+            Delete this reservation?
+            <br>
+            This action cannot be undone.
+        </p>
+
+        <div class="confirm-actions">
+            <button type="button" class="confirm-delete" onclick="confirmDeleteReservation()">
+                Delete
+            </button>
+
+            <button type="button" class="confirm-cancel" onclick="closeDeleteReservationPopup()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+<div class="confirm-overlay" id="statusConfirmPopup">
+    <div class="confirm-card">
+        <button type="button" class="confirm-x" onclick="closeStatusPopup()">
+            &times;
+        </button>
+
+        <div class="confirm-icon">
+            <i class="fas fa-exclamation"></i>
+        </div>
+
+        <h2>Are you sure?</h2>
+
+        <p id="statusPopupMessage"></p>
+
+        <div class="confirm-actions">
+            <button type="button" class="confirm-delete" onclick="confirmStatusUpdate()">
+                Confirm
+            </button>
+
+            <button type="button" class="confirm-cancel" onclick="closeStatusPopup()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+<div class="confirm-overlay" id="logoutConfirmPopup">
+    <div class="confirm-card">
+        <button type="button" class="confirm-x" onclick="closeLogoutPopup()">
+            &times;
+        </button>
+
+        <div class="confirm-icon">
+            <i class="fas fa-exclamation"></i>
+        </div>
+
+        <h2>Are you sure?</h2>
+
+        <p>Are you sure you want to log out?</p>
+
+        <div class="confirm-actions">
+            <button type="button" class="confirm-delete" onclick="confirmLogout()">
+                Log Out
+            </button>
+
+            <button type="button" class="confirm-cancel" onclick="closeLogoutPopup()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

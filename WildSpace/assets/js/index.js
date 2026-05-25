@@ -127,3 +127,11 @@ document.head.appendChild(style);
 // ============ CONSOLE MESSAGE ============
 console.log('%cWildSpace', 'font-size: 20px; font-weight: bold; color: #000;');
 console.log('%cStudy without the hassle of finding a space.', 'font-size: 14px; color: #555;');
+
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}

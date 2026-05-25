@@ -127,3 +127,12 @@ if (data.success) {
         registerSubmit.textContent = "Create Account";
     });
 });
+
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}

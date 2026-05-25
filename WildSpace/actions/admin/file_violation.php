@@ -26,11 +26,15 @@ $allowedTypes = [
 ];
 
 if (empty($reservation_id) || empty($violation_type) || empty($description)) {
-    die('Please complete all fields.');
+    $_SESSION['popup_error'] = "Please complete all fields.";
+    header("Location: ../../client_side/admin_dashboard.php?view=file_violation");
+    exit();
 }
 
 if (!in_array($violation_type, $allowedTypes, true)) {
-    die('Invalid violation type.');
+    $_SESSION['popup_error'] = "Invalid violation type.";
+    header("Location: ../../client_side/admin_dashboard.php?view=file_violation");
+    exit();
 }
 
 $reservationSql = "SELECT reservation_id, student_id, status
@@ -41,7 +45,9 @@ $reservationSql = "SELECT reservation_id, student_id, status
 $reservationResult = pg_query_params($conn, $reservationSql, [$reservation_id]);
 
 if (!$reservationResult || pg_num_rows($reservationResult) === 0) {
-    die('Approved reservation not found.');
+    $_SESSION['popup_error'] = "Approved reservation not found.";
+    header("Location: ../../client_side/admin_dashboard.php?view=file_violation");
+    exit();   
 }
 
 $reservation = pg_fetch_assoc($reservationResult);
@@ -60,9 +66,12 @@ $insertResult = pg_query_params($conn, $insertSql, [
 ]);
 
 if (!$insertResult) {
-    die('Failed to file violation: ' . pg_last_error($conn));
+    $_SESSION['popup_error'] = "Failed to file violation.";
+    header('Location: ../../client_side/admin_dashboard.php?view=file_violation');
+    exit();
 }
 
+$_SESSION['popup_success'] = "Violation report filed successfully.";
 header('Location: ../../client_side/admin_dashboard.php?view=file_violation');
 exit();
 ?>

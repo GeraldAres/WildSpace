@@ -24,7 +24,8 @@ $deleteReservations = pg_query_params(
 
 if (!$deleteReservations) {
     pg_query($conn, 'ROLLBACK');
-    echo 'Failed to delete student reservations: ' . pg_last_error($conn);
+    $_SESSION['popup_error'] = "Failed to delete student reservations.";
+    header("Location: ../../client_side/admin_dashboard.php?view=students");
     exit();
 }
 
@@ -51,7 +52,8 @@ $deleteStudent = pg_query_params(
 
 if (!$deleteStudent) {
     pg_query($conn, 'ROLLBACK');
-    echo 'Failed to delete student: ' . pg_last_error($conn);
+    $_SESSION['popup_error'] = "Failed to delete student reservations.";
+    header("Location: ../../client_side/admin_dashboard.php?view=students");
     exit();
 }
 
@@ -63,7 +65,8 @@ $deleteUser = pg_query_params(
 
 if (!$deleteUser) {
     pg_query($conn, 'ROLLBACK');
-    echo 'Failed to delete user account: ' . pg_last_error($conn);
+    $_SESSION['popup_error'] = "Failed to delete student reservations.";
+    header("Location: ../../client_side/admin_dashboard.php?view=students");
     exit();
 }
 

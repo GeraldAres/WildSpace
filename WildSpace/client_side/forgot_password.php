@@ -1,5 +1,14 @@
 <?php
 session_start();
+if (isset($_SESSION['forgot_success'])) {
+    $_SESSION['popup_success'] = $_SESSION['forgot_success'];
+    unset($_SESSION['forgot_success']);
+}
+
+if (isset($_SESSION['forgot_error'])) {
+    $_SESSION['popup_error'] = $_SESSION['forgot_error'];
+    unset($_SESSION['forgot_error']);
+}
 ?>
 
 <!DOCTYPE html>
@@ -8,8 +17,10 @@ session_start();
     <meta charset="UTF-8">
     <title>WildSpace - Forgot Password</title>
     <link rel="stylesheet" href="../assets/css/auth.css">
+    <link rel="stylesheet" href="../assets/css/popup.css">
 </head>
 <body>
+    <?php include __DIR__ . '/popup.php'; ?>
     <nav class="navbar">
     <div class="nav-container">
         <div class="nav-left">
@@ -39,24 +50,6 @@ session_start();
 
         <form class="auth-form" action="../actions/forgot_password_action.php" method="POST">
 
-            <?php if (isset($_SESSION['forgot_error'])) { ?>
-                <div class="auth-message auth-message--error">
-                    <?php 
-                        echo htmlspecialchars($_SESSION['forgot_error']); 
-                        unset($_SESSION['forgot_error']);
-                    ?>
-                </div>
-            <?php } ?>
-
-            <?php if (isset($_SESSION['forgot_success'])) { ?>
-                <div class="auth-message auth-message--success">
-                    <?php 
-                        echo htmlspecialchars($_SESSION['forgot_success']); 
-                        unset($_SESSION['forgot_success']);
-                    ?>
-                </div>
-            <?php } ?>
-
             <div class="form-group">
                 <input type="email" name="email" class="form-input" placeholder="Educational Email:" required>
             </div>
@@ -81,6 +74,14 @@ session_start();
         </div>
     </div>
 </main>
-
+<script>
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}
+</script>
 </body>
 </html>

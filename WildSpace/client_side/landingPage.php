@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WildSpace - Study Without the Hassle</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/popup.css">
 </head>
 <body>
+    <?php include __DIR__ . '/popup.php'; ?>
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">

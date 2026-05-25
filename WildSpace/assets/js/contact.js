@@ -33,3 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     });
 });
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}

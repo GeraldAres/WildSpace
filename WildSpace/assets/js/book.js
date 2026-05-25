@@ -37,3 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.opacity = '0.7';
     });
 });
+
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}

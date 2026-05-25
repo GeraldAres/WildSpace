@@ -19,8 +19,12 @@ $sql = "DELETE FROM tblreservation
         WHERE reservation_id = $1 
         AND student_id = $2";
 
-$result = pg_query_params($conn, $sql, [$reservation_id, $student_id]);
+if ($result) {
+    $_SESSION['popup_success'] = "Reservation deleted successfully.";
+} else {
+    $_SESSION['popup_error'] = "Failed to delete reservation.";
+}
 
-header("Location: ../../client_side/student_dashboard.php");
+header("Location: ../../client_side/student_dashboard.php?view=reservations");
 exit();
 ?>
