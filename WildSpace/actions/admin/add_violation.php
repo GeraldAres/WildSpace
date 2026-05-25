@@ -39,13 +39,19 @@ $insertSql = "INSERT INTO tblviolation
                 ($1, $2, $3, $4, $5)
               ON CONFLICT (reservation_id) DO NOTHING";
 
-pg_query_params($conn, $insertSql, [
+$insertResult = pg_query_params($conn, $insertSql, [
     $reservation['reservation_id'],
     $reservation['student_id'],
     $admin_id,
     'No Show',
     'Student did not show up for an approved reservation.'
 ]);
+
+if ($insertResult) {
+    $_SESSION['popup_success'] = "No-show violation added successfully.";
+} else {
+    $_SESSION['popup_error'] = "Failed to add no-show violation.";
+}
 
 header("Location: ../../client_side/admin_dashboard.php?view=requests");
 exit();

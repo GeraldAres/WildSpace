@@ -58,3 +58,49 @@ if (capacityInput && spaceTypeSelect && soloTableOption) {
 
     updateSoloTableOption();
 }
+
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}
+
+let deleteReservationUrl = "";
+
+function openDeleteReservationPopup(url) {
+    deleteReservationUrl = url;
+    document.getElementById("deleteReservationPopup").classList.add("active");
+}
+
+function closeDeleteReservationPopup() {
+    document.getElementById("deleteReservationPopup").classList.remove("active");
+    deleteReservationUrl = "";
+}
+
+function confirmDeleteReservation() {
+    if (deleteReservationUrl !== "") {
+        window.location.href = deleteReservationUrl;
+    }
+}
+
+function openLogoutPopup() {
+    document.getElementById("logoutConfirmPopup").classList.add("active");
+}
+
+function closeLogoutPopup() {
+    document.getElementById("logoutConfirmPopup").classList.remove("active");
+}
+
+function confirmLogout() {
+    window.location.href = "../actions/admin/logout.php";
+}

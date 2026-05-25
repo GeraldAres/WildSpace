@@ -380,11 +380,36 @@ body {
 .form-input::placeholder {
     color: rgba(255,255,255,0.75);
 }
-
 /* SELECT */
+.select-wrapper {
+    position: relative;
+}
+
 select.form-input {
     appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    color: #eef2ff;
+    background: rgba(255,255,255,0.05);
+    padding-right: 70px;
     cursor: pointer;
+}
+
+select.form-input option {
+    background: #111827;
+    color: #eef2ff;
+}
+
+.select-icon {
+    position: absolute;
+    right: 34px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #eef2ff;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 2;
 }
 
 /* ================= BUTTON ================= */
@@ -473,3 +498,4 @@ select.form-input {
 .social-icon:hover {
     transform: translateY(-2px);
 }
+

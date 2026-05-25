@@ -15,7 +15,7 @@ if ($role === 'admin') {
 } elseif ($role === 'student') {
     $dashboard = "../../client_side/student_dashboard.php";
 } else {
-    $_SESSION['profile_error'] = "Invalid account role.";
+    $_SESSION['popup_error'] = "Invalid account role.";
     header("Location: ../client_side/edit_profile.php");
     exit();
 }
@@ -31,7 +31,7 @@ $mobile_number = trim($_POST['mobile_number'] ?? '');
 $gender = trim($_POST['gender'] ?? '');
 
 if (!empty($mobile_number) && !preg_match('/^[0-9]{11}$/', $mobile_number)) {
-    $_SESSION['profile_error'] = "Mobile number must contain exactly 11 digits.";
+    $_SESSION['popup_error'] = "Mobile number must contain exactly 11 digits.";
     header("Location: ../client_side/edit_profile.php");
     exit();
 }
@@ -39,7 +39,7 @@ if (!empty($mobile_number) && !preg_match('/^[0-9]{11}$/', $mobile_number)) {
 $allowed_genders = ['', 'Male', 'Female', 'Prefer not to say'];
 
 if (!in_array($gender, $allowed_genders)) {
-    $_SESSION['profile_error'] = "Invalid gender selected.";
+    $_SESSION['popup_error'] = "Invalid gender selected.";
     header("Location: ../client_side/edit_profile.php");
     exit();
 }
@@ -60,11 +60,12 @@ $result = pg_query_params($conn, $sql, [
 ]);
 
 if ($result) {
+    $_SESSION['popup_success'] = "Profile updated successfully.";
     header("Location: " . $dashboard);
     exit();
 }
 
-$_SESSION['profile_error'] = "Failed to update profile: " . pg_last_error($conn);
+$_SESSION['popup_error'] = "Failed to update profile: " . pg_last_error($conn);
 header("Location: ../client_side/edit_profile.php");
 exit();
 ?>

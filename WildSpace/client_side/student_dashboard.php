@@ -1,5 +1,12 @@
 <?php
 include '../actions/student/student_dashboard_logic.php';
+if (!empty($message)) {
+    if ($messageType === 'success') {
+        $_SESSION['popup_success'] = $message;
+    } else {
+        $_SESSION['popup_error'] = $message;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -10,11 +17,11 @@ include '../actions/student/student_dashboard_logic.php';
     <link rel="stylesheet" href="../assets/css/admin-dashboard.css">
     <link rel="stylesheet" href="../assets/css/student-dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
+    <link rel="stylesheet" href="../assets/css/popup.css">
 </head>
 
 <body>
-
+<?php include __DIR__ . '/popup.php'; ?>
 <div class="admin-layout">
     <aside class="admin-sidebar">
         <div class="sidebar-brand">
@@ -53,22 +60,16 @@ include '../actions/student/student_dashboard_logic.php';
                 <i class="fas fa-user-pen"></i>
                 Edit Profile
             </a>
-            <a href="../actions/admin/logout.php"
-               class="sidebar-link logout-link"
-               onclick="return confirm('Are you sure you want to log out?');">
+            <button type="button"
+                    class="sidebar-link logout-link"
+                    onclick="openLogoutPopup()">
                 <i class="fas fa-right-from-bracket"></i>
                 Log Out
-            </a>
+            </button>
         </div>
     </aside>
 
     <main class="admin-main">
-
-        <?php if ($message !== "") { ?>
-            <div class="message <?php echo $messageType; ?>">
-                <?php echo htmlspecialchars($message); ?>
-            </div>
-        <?php } ?>
 
         <?php if ($view === 'reservations') { ?>
 
@@ -154,11 +155,11 @@ include '../actions/student/student_dashboard_logic.php';
                                         </td>
 
                                         <td>
-                                            <a class="action-btn delete-btn"
-                                               href="../actions/student/delete_reservation.php?id=<?php echo urlencode($row['reservation_id']); ?>"
-                                               onclick="return confirm('Are you sure you want to delete this reservation?');">
-                                                Delete
-                                            </a>
+                                        <button type="button"
+                                                class="action-btn delete-btn"
+                                                onclick="openDeleteReservationPopup('../actions/student/delete_reservation.php?id=<?php echo urlencode($row['reservation_id']); ?>')">
+                                            Delete
+                                        </button>
                                         </td>
                                     </tr>
                                 <?php } ?>
@@ -472,6 +473,55 @@ include '../actions/student/student_dashboard_logic.php';
     </div>
 </div>
 
+<div class="confirm-overlay" id="deleteReservationPopup">
+    <div class="confirm-card">
+        <button type="button" class="confirm-x" onclick="closeDeleteReservationPopup()">
+            &times;
+        </button>
+
+        <div class="confirm-icon">
+            <i class="fas fa-exclamation"></i>
+        </div>
+
+        <h2>Are you sure?</h2>
+        <p>Are you sure you want to delete this reservation?<br>This action cannot be undone.</p>
+
+        <div class="confirm-actions">
+            <button type="button" class="confirm-delete" onclick="confirmDeleteReservation()">
+                Delete
+            </button>
+
+            <button type="button" class="confirm-cancel" onclick="closeDeleteReservationPopup()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="confirm-overlay" id="logoutConfirmPopup">
+    <div class="confirm-card">
+        <button type="button" class="confirm-x" onclick="closeLogoutPopup()">
+            &times;
+        </button>
+
+        <div class="confirm-icon">
+            <i class="fas fa-exclamation"></i>
+        </div>
+
+        <h2>Are you sure?</h2>
+        <p>Are you sure you want to log out?</p>
+
+        <div class="confirm-actions">
+            <button type="button" class="confirm-delete" onclick="confirmLogout()">
+                Log Out
+            </button>
+
+            <button type="button" class="confirm-cancel" onclick="closeLogoutPopup()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
 <script src="../assets/js/student-dashboard.js"></script>
 </body>
 </html>

@@ -34,6 +34,18 @@ $result = pg_query_params($conn, $sql, [
     $reservation_id
 ]);
 
+$result = pg_query_params($conn, $sql, [
+    $status,
+    $admin_id,
+    $reservation_id
+]);
+
+if ($result) {
+    $_SESSION['popup_success'] = "Reservation status updated successfully.";
+} else {
+    $_SESSION['popup_error'] = "Failed to update reservation status.";
+}
+
 header("Location: ../../client_side/admin_dashboard.php?view=requests");
 exit();
 ?>

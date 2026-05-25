@@ -13,3 +13,10 @@ function selectRole(role) {
         adminCard.classList.add("active");
     }
 }
+function closePopup() {
+    const popup = document.getElementById("systemPopup");
+    if (popup) {
+        popup.classList.remove("active");
+        popup.style.display = "none";
+    }
+}
