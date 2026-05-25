@@ -117,12 +117,14 @@ if ($commentResult) {
         </div>
         <div class="nav-right">
             <div class="nav-actions">
+                <a href="community.php" class="nav-link">Community</a>
+
                 <?php if ($isLoggedIn) { ?>
                     <a href="student_dashboard.php" class="nav-link">My Dashboard</a>
                 <?php } ?>
+
                 <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
             </div>
-
             <div class="account-area">
                 <div class="profile-dropdown">
                     <button type="button" class="profile-button">

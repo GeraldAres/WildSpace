@@ -32,9 +32,9 @@ if ($isLoggedIn) {
                 <h1 class="logo-text">WildSpace</h1>
             </div>
             <div class="nav-right">
-                <a href="community.php" class="nav-link">Community</a>
-                <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
+                
                     <div class="nav-actions">
+                        <a href="community.php" class="nav-link">Community</a>
                         <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
                     </div>
 
@@ -140,22 +140,22 @@ if ($isLoggedIn) {
                 <p class="section5-branding">WildSpace</p>
                 <h2 class="section5-main-title"><span class="section5-bold">Platform</span>Features</h2>
                     <p class="section5-subtitle">Connect, rate, and discuss study spaces with your peers</p>
-                <div class="platform-features">
-                    <div class="feature-item">
-                        <button class="feature-button" onclick="location.href='community.php'">Community Feed</button>
-                        <p class="feature-text">Share your take on booked study spaces and discover helpful peer feedback.</p>
-                    </div>
+                    <div class="platform-features">
+                        <div class="feature-item">
+                            <button class="feature-button">Live Space Tracker</button>
+                            <p class="feature-text">See real-time study space availability before booking.</p>
+                        </div>
 
-                    <div class="feature-item">
-                        <button class="feature-button" onclick="location.href='community.php'">Study Group Chat</button>
-                        <p class="feature-text">Ask questions, discuss room preferences, and exchange study tips.</p>
-                    </div>
+                        <div class="feature-item">
+                            <button class="feature-button">Instant Booking</button>
+                            <p class="feature-text">Reserve available study spaces quickly and easily.</p>
+                        </div>
 
-                    <div class="feature-item">
-                        <button class="feature-button">Live Space Tracker</button>
-                        <p class="feature-text">See real-time availability and secure your spot before it's taken.</p>
+                        <div class="feature-item">
+                            <button class="feature-button">Book by Group</button>
+                            <p class="feature-text">Choose spaces based on your group size and study needs.</p>
+                        </div>
                     </div>
-                </div>
             </div>
         </div>
     </section>
