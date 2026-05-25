@@ -53,6 +53,12 @@ if (!empty($message)) {
                 <i class="fas fa-triangle-exclamation"></i>
                 Violation History
             </a>
+
+            <a href="student_dashboard.php?view=tracker"
+               class="sidebar-link <?php echo $view === 'tracker' ? 'active' : ''; ?>">
+                <i class="fas fa-chart-line"></i>
+                Live Space Tracker
+            </a>
         </nav>
 
         <div class="sidebar-footer">
@@ -449,6 +455,61 @@ if (!empty($message)) {
                            <?php if ($violationPage >= $violationPageCount) echo 'aria-disabled="true" tabindex="-1"'; ?>>
                             Next &raquo;
                         </a>
+                    </div>
+                </section>
+            </section>
+
+        <?php } ?>
+
+        <?php if ($view === 'tracker') { ?>
+
+            <section class="admin-panel active">
+                <header class="dashboard-header">
+                    <div class="dashboard-title">
+                        <h1>Live Space Tracker</h1>
+                        <p>Non-editable booking counts for each study space type, updated from current reservations.</p>
+                    </div>
+                </header>
+
+                <section class="summary-cards cols-4">
+                    <?php foreach ($spaceTracker as $type => $stats) { ?>
+                        <div class="summary-card">
+                            <span><?php echo htmlspecialchars($type); ?></span>
+                            <strong><?php echo htmlspecialchars($stats['people_count']); ?> people</strong>
+                            <p><?php echo htmlspecialchars($stats['reservation_count']); ?> reservations</p>
+                        </div>
+                    <?php } ?>
+                </section>
+
+                <section class="table-card">
+                    <div class="table-header">
+                        <h2>Booking Overview</h2>
+                        <p>Counts reflect pending and approved future reservations to help you see current usage at a glance.</p>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Space Type</th>
+                                    <th>Reservations</th>
+                                    <th>People Booked</th>
+                                    <th>Approved</th>
+                                    <th>Pending</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($spaceTracker as $type => $stats) { ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($type); ?></td>
+                                        <td><?php echo htmlspecialchars($stats['reservation_count']); ?></td>
+                                        <td><?php echo htmlspecialchars($stats['people_count']); ?></td>
+                                        <td><?php echo htmlspecialchars($stats['approved_count']); ?></td>
+                                        <td><?php echo htmlspecialchars($stats['pending_count']); ?></td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             </section>

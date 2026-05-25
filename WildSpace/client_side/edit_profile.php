@@ -39,6 +39,17 @@ if (isset($_SESSION['profile_error'])) {
     $_SESSION['popup_error'] = $_SESSION['profile_error'];
     unset($_SESSION['profile_error']);
 }
+
+$isLoggedIn = isset($_SESSION['user_id'], $_SESSION['role']);
+$profileName = '';
+$profileInitial = 'P';
+if ($isLoggedIn) {
+    $profileName = trim(($_SESSION['firstname'] ?? '') . ' ' . ($_SESSION['lastname'] ?? ''));
+    if ($profileName === '') {
+        $profileName = $_SESSION['email'] ?? 'Profile';
+    }
+    $profileInitial = strtoupper(substr($profileName, 0, 1));
+}
 ?>
 
 <!DOCTYPE html>
@@ -53,9 +64,39 @@ if (isset($_SESSION['profile_error'])) {
 <body>
 <?php include __DIR__ . '/popup.php'; ?>
 <nav class="navbar">
-    <a href="<?php echo htmlspecialchars($dashboard); ?>" class="nav-link">Back to Dashboard</a>
-    <div class="logo-text">WildSpace</div>
-    <div></div>
+    <div class="nav-container">
+        <div class="nav-left">
+            <a href="index.php" class="nav-link">Home</a>
+            <a href="landingPage.php" class="nav-link">About Us</a>
+        </div>
+        <div class="logo">
+            <h1 class="logo-text">WildSpace</h1>
+        </div>
+        <div class="nav-right">
+            <a href="<?php echo htmlspecialchars($dashboard); ?>" class="nav-link">Back to Dashboard</a>
+            <button class="cta-button" onclick="location.href='contact.php'">Contact Us</button>
+
+            <div class="account-area">
+                <?php if ($isLoggedIn) { ?>
+                    <div class="profile-dropdown">
+                        <button type="button" class="profile-button">
+                            <span class="profile-avatar"><?php echo htmlspecialchars($profileInitial); ?></span>
+                            <span class="profile-name"><?php echo htmlspecialchars($profileName); ?></span>
+                        </button>
+                        <div class="profile-menu">
+                            <a href="student_dashboard.php">Dashboard</a>
+                            <a href="../actions/logout.php">Log Out</a>
+                        </div>
+                    </div>
+                <?php } else { ?>
+                    <div class="auth-links">
+                        <a href="login.php" class="nav-link">Log In</a>
+                        <a href="register.php" class="nav-link">Register</a>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
 </nav>
 
 <main class="page-wrapper">

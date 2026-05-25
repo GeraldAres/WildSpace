@@ -225,3 +225,23 @@ function closePopup() {
         popup.style.display = "none";
     }
 }
+
+// Profile dropdown toggle (click) - works on touch and desktop
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.profile-button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = btn.closest('.profile-dropdown');
+            if (!dropdown) return;
+            const menu = dropdown.querySelector('.profile-menu');
+            if (!menu) return;
+            // toggle
+            menu.classList.toggle('open');
+        });
+    });
+
+    // Close when clicking elsewhere
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.profile-menu.open').forEach(menu => menu.classList.remove('open'));
+    });
+});

@@ -17,7 +17,7 @@ if (empty($email) || empty($password)) {
     exit();
 }
 
-$sql = "SELECT user_id, email, password
+$sql = "SELECT user_id, email, password, firstname, lastname
         FROM tbluser
         WHERE email = $1";
 
@@ -47,6 +47,8 @@ $user_id = $user['user_id'];
 
 $_SESSION['user_id'] = $user_id;
 $_SESSION['email'] = $user['email'];
+$_SESSION['firstname'] = $user['firstname'];
+$_SESSION['lastname'] = $user['lastname'];
 
 $adminSql = "SELECT admin_id
              FROM tbladmin

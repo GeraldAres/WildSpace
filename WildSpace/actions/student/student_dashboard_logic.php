@@ -14,7 +14,7 @@ $messageType = "";
 
 $view = $_GET['view'] ?? 'reservations';
 
-if (!in_array($view, ['reservations', 'book', 'reservation_history', 'violations'])) {
+if (!in_array($view, ['reservations', 'book', 'reservation_history', 'violations', 'tracker'])) {
     $view = 'reservations';
 }
 
